@@ -1,9 +1,9 @@
-UTC: 2026-09-30T08:48:48Z to 2026-09-30T08:49:23Z
+UTC: 2026-09-30T08:53:13Z to 2026-09-30T08:53:47Z
 SOURCE: GitHub Actions job metadata for optional MSSQL assessment workflow
-COMMIT: 42fa278
-RUN: https://github.com/abdulrahman-alabdullah/thmanyah-assignment/actions/runs/36692048740
+COMMIT: e674af2
+RUN: https://github.com/abdulrahman-alabdullah/thmanyah-assignment/actions/runs/36692522846
 JOB: mssql-backup-restore — completed / success
 RUNNER: GitHub-hosted Ubuntu 24.04 x86-64
 STEP: Initialize SQL Server and verify backup/restore — completed / success
 
-The successful step runs mssql/acceptance.sh, which waits for SQL Server readiness, applies the database schema and idempotent seed, creates and checksum-verifies a compressed backup, restores it under a separate database name, checks the expected seeded event, confirms the backup retention command completed, and cleans up its isolated container and volume. The job and step both concluded successfully. The linked GitHub run provides the runner's detailed console output.
+The successful step runs mssql/acceptance.sh, which waits for SQL Server readiness, applies the database schema and idempotent seed, creates and checksum-verifies a compressed backup, restores it under a separate database name, checks the expected seeded event, confirms the 14-copy retention command completed, passes the SQL password through the SQLCMDPASSWORD environment variable, and cleans up its isolated container and volume. The job and step both concluded successfully. The linked GitHub run provides the runner's detailed console output.
