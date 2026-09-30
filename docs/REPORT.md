@@ -15,7 +15,7 @@ The submission includes local application, monitoring, storage and streaming dem
 | S3 bucket-to-bucket multipart transfer | Python copy engine and Node-RED flow | Three-part AWS multipart copy and SHA-256 equality passed; objects and buckets deleted after test |
 | Terraform and Ansible with three VPCs and VPN | AWS resources, inventory, vault templates, WireGuard and service configuration | Temporary three-VPC apply, VPN handshake/private reachability, public API, database restore, and second Ansible run (zero changes) passed; stack destroyed afterward |
 | Full HD HEVC broadcast to Elemental with S3 archive | Local TS encoder, OBS instructions, SRT/MediaLive request generator | MediaLive input/channel and OBS HEVC profile were prepared; channel was not started, so live ingest and S3 archive remain unverified; resources deleted |
-| Optional MSSQL database, backup, and restore | SQL Server 2022 Developer container, idempotent schema/seed, scheduled compressed/checksummed backups and isolated restore test | Implementation is included; end-to-end SQL Server runtime evidence is pending its x86-64 GitHub Actions run |
+| Optional MSSQL database, backup, and restore | SQL Server 2022 Developer container, idempotent schema/seed, scheduled compressed/checksummed backups and isolated restore test | GitHub Actions x86-64 Ubuntu run passed the end-to-end acceptance script; evidence is indexed in `docs/evidence/mssql-actions.log` |
 
 The repository holds implementation files and timestamped logs under `docs/evidence/`. It contains no cloud deployment evidence borrowed from another submission. For reproduction, start with the root README and the walkthroughs linked there.
 
@@ -116,7 +116,7 @@ PostgreSQL backup uses `pg_dump -Fc` through `scripts/backup.sh`. A test restore
 
 The separate optional MSSQL implementation is in `mssql/` and `compose.mssql.yaml`. It creates `AssessmentMSSQL`, a constrained `dbo.BroadcastEvents` table and a stable-key 1080p broadcast sample with 12,000 kbps video and 192 kbps audio. The setup is idempotent. SQL Server Developer runs on a private Docker network with no published port, a 2-CPU/2-GiB cap and a persistent named volume.
 
-`mssql/backup.sh` makes a UTC timestamped compressed backup with checksums and then validates it with `RESTORE VERIFYONLY`. A systemd service/timer schedules it daily at 02:00 UTC on a supported x86-64 Linux host. `mssql/acceptance.sh` exercises database creation, repeatable seed, backup, restore to a separate database and seed-row readback before removing its temporary container and volume. The GitHub Actions job uses an x86-64 Ubuntu runner for that acceptance test. SQL Server Linux containers are not supported on Apple Silicon; as of report preparation, the hosted acceptance job has not yet supplied its result. The production design still requires encrypted off-host backup retention and scheduled restore drills.
+`mssql/backup.sh` makes a UTC timestamped compressed backup with checksums and then validates it with `RESTORE VERIFYONLY`. A systemd service/timer schedules it daily at 02:00 UTC on a supported x86-64 Linux host. `mssql/acceptance.sh` exercises database creation, repeatable seed, backup, restore to a separate database and seed-row readback before removing its temporary container and volume. The GitHub Actions job ran on an x86-64 Ubuntu runner and passed all acceptance steps (run `36691313589`, commit `41e7c0a`; see `docs/evidence/mssql-actions.log`). SQL Server Linux containers are not supported on Apple Silicon, so this host was not used as the database runtime. The production design still requires encrypted off-host backup retention and scheduled restore drills.
 
 ## 4 Node-RED and S3 multipart transfer
 
@@ -239,6 +239,7 @@ The generated request files pass SDK schema validation. In the acceptance run, A
 | `aws-windows-reboot.log` | Reboot check showing the Windows drive mapping did not reconnect |
 | `aws-cleanup.log` | Terraform destroy completion for the temporary stack |
 | `medialive-schema.log` | MediaLive request shape checks |
+| `mssql-actions.log` | SQL Server schema, backup verification, restore and readback passed on x86-64 GitHub Actions |
 
 The remaining acceptance items are to fix Windows drive reconnection after reboot and complete one OBS-to-MediaLive test that confirms HEVC ingest and an actual S3 archive object. Current cloud resources have been deleted to control cost; repeating those checks requires a new temporary deployment and budget review. The tested S3 multipart transfer and AWS infrastructure stack are not currently running.
 

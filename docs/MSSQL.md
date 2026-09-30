@@ -4,7 +4,7 @@ This implements the assessment's optional Microsoft SQL Server task: create a da
 
 ## Run on a supported host
 
-Microsoft supports SQL Server Linux containers on x86-64 Linux hosts. This Compose setup pins the SQL Server major version to 2022, runs Developer edition for this non-production assessment, keeps the SQL port private, caps the container at two CPUs and 2 GiB RAM, and persists the SQL data and backups in a named Docker volume. Apple Silicon Docker emulation is not a supported SQL Server host; use the included GitHub Actions workflow or a real x86-64 Linux machine. Azure SQL Edge is retired and is not used.
+Microsoft supports SQL Server Linux containers on x86-64 Linux hosts ([Microsoft container deployment requirements](https://learn.microsoft.com/en-us/sql/linux/sql-server-linux-docker-container-deployment?view=sql-server-ver17)). This Compose setup pins the SQL Server major version to 2022, runs Developer edition for this non-production assessment, keeps the SQL port private, caps the container at two CPUs and 2 GiB RAM, and persists the SQL data and backups in a named Docker volume. Apple Silicon Docker emulation is not a supported SQL Server host; use the included GitHub Actions workflow or a real x86-64 Linux machine. Azure SQL Edge was retired in 2025 and is not used ([Microsoft lifecycle notice](https://learn.microsoft.com/en-us/lifecycle/products/azure-sql-edge)).
 
 On an x86-64 Linux host with Docker Compose v2:
 
@@ -41,7 +41,7 @@ export MSSQL_SA_PASSWORD='Use-a-unique-strong-password-here-42!'
 bash mssql/acceptance.sh
 ```
 
-On this Apple Silicon Mac, the supported run is the GitHub Actions workflow `.github/workflows/mssql.yml`, which executes on GitHub's x86-64 Ubuntu runner without AWS resources or credentials. The acceptance script destroys its isolated test volume on exit. A manual/local SQL Server deployment uses a persistent named volume; remove it only when its database and backups are no longer needed:
+On this Apple Silicon Mac, the supported run is the GitHub Actions workflow `.github/workflows/mssql.yml`, which executes on GitHub's x86-64 Ubuntu runner without AWS resources or credentials. The acceptance run passed on 2026-09-30; see [the recorded run](evidence/mssql-actions.log). The acceptance script destroys its isolated test volume on exit. A manual/local SQL Server deployment uses a persistent named volume; remove it only when its database and backups are no longer needed:
 
 ```sh
 docker compose -f compose.mssql.yaml down

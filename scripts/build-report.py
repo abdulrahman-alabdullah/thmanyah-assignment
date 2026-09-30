@@ -18,6 +18,7 @@ h1{font-size:28pt;line-height:1.18;margin:0 0 8mm;font-weight:600;color:#000}
 h2{font-size:17pt;line-height:1.3;margin:9mm 0 4mm;font-weight:600;color:#000;break-after:avoid}
 h2[id="7-evidence-index-and-remaining-acceptance-checks"]{break-before:page}
 h3{font-size:12pt;line-height:1.3;margin:6mm 0 3mm;font-weight:600;color:#000;break-after:avoid}
+h3[id="36-optional-microsoft-sql-server-task"]{break-before:page}
 p{margin:0 0 3mm;orphans:3;widows:3}a{color:#174b3e;text-decoration:underline;overflow-wrap:anywhere}
 table{width:100%;border-collapse:collapse;font-size:8.5pt;margin:4mm 0 5mm;table-layout:auto}
 th{background:#263d36;color:white;font-weight:600;text-align:left}th,td{padding:2.3mm;border:1px solid #d9d9d9;vertical-align:middle}

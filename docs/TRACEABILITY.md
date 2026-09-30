@@ -36,9 +36,9 @@ The assessment marks MSSQL as optional. This task is implemented separately from
 
 | Requested item | Implementation and run guide | Evidence and result |
 | --- | --- | --- |
-| Create a SQL Server database, table, and representative row | [Idempotent schema and seed](../mssql/init.sql), [private Compose service](../compose.mssql.yaml), [run guide](MSSQL.md) | Table constraints and a stable-key broadcast sample are defined. End-to-end run is pending the x86-64 GitHub Actions acceptance job. |
-| Automate database backup | [Backup script](../mssql/backup.sh), [daily systemd timer](../mssql/thmanyah-mssql-backup.timer), [service](../mssql/thmanyah-mssql-backup.service) | Timestamped compressed backup with checksum, followed by `RESTORE VERIFYONLY`; installable daily timer is documented. |
-| Restore the backup and verify data | [Acceptance script](../mssql/acceptance.sh), [GitHub Actions workflow](../.github/workflows/mssql.yml) | Test restores into a separate database, checks the seeded event, drops the temporary restore, and destroys its isolated test volume. CI result is pending. |
+| Create a SQL Server database, table, and representative row | [Idempotent schema and seed](../mssql/init.sql), [private Compose service](../compose.mssql.yaml), [run guide](MSSQL.md) | [GitHub Actions evidence](evidence/mssql-actions.log): x86-64 run passed using the table constraints and stable-key broadcast sample. |
+| Automate database backup | [Backup script](../mssql/backup.sh), [daily systemd timer](../mssql/thmanyah-mssql-backup.timer), [service](../mssql/thmanyah-mssql-backup.service) | The successful x86-64 run created a timestamped compressed backup with checksum and passed `RESTORE VERIFYONLY`; an installable daily timer is documented. |
+| Restore the backup and verify data | [Acceptance script](../mssql/acceptance.sh), [GitHub Actions workflow](../.github/workflows/mssql.yml) | The successful run restored into a separate database, checked the seeded event, dropped the temporary restore, and destroyed its isolated test volume. |
 
 On Apple Silicon, follow the guide's x86-64 CI path; Microsoft does not support SQL Server Linux containers on Apple Silicon hosts. The local Mac is not claimed as a successful SQL Server runtime.
 
