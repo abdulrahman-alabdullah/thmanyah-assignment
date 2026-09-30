@@ -1,0 +1,6 @@
+UTC: 2026-09-30T06:25:19.078763+00:00
+COMMAND: docker compose -f compose.s3.yaml exec -T nodered node -e fetch('http://s3-worker:9000/copy',{method:'POST'}).then(async r=>{console.log(r.status,await r.text());if(!r.ok)process.exit(1)}).catch(e=>{console.error(e);process.exit(1)})
+EXIT: 0
+
+200 {"bytes":14000000,"mib_per_second":398.82,"parts":3,"seconds":0.033}
+

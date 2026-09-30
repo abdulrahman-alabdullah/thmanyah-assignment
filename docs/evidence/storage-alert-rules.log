@@ -1,0 +1,7 @@
+UTC: 2026-09-30T06:25:22.876518+00:00
+COMMAND: docker compose -f compose.storage.yaml exec -T prometheus promtool check rules /etc/prometheus/alerts.yml
+EXIT: 0
+
+Checking /etc/prometheus/alerts.yml
+  SUCCESS: 5 rules found
+

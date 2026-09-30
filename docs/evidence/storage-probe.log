@@ -1,0 +1,9 @@
+UTC: 2026-09-30T06:25:19.781592+00:00
+COMMAND: docker compose -f compose.storage.yaml exec -T client python -c import urllib.request;print(urllib.request.urlopen('http://localhost:9101/metrics').read().decode())
+EXIT: 0
+
+share_probe_success 1
+share_probe_duration_seconds 0.011316040999872712
+share_available_bytes 910139072512
+share_total_bytes 977843695616
+

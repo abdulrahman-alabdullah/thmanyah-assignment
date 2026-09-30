@@ -1,0 +1,2 @@
+# Linux /etc/fstab entry. Change server address, uid and gid for your host.
+//10.10.10.10/media /mnt/windows-media cifs credentials=/etc/smb-credentials,vers=3.1.1,seal,uid=1000,gid=1000,nosuid,nodev,noexec,_netdev,nofail,x-systemd.automount,x-systemd.mount-timeout=15s 0 0

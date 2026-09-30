@@ -1,0 +1,9 @@
+[Interface]
+Address = 10.99.0.1/24
+ListenPort = 51820
+PrivateKey = {{ wireguard_server_key.content | b64decode | trim }}
+PostUp = iptables -A FORWARD -i %i -d 10.10.0.0/16 -j ACCEPT; iptables -A FORWARD -i %i -d 10.20.0.0/16 -j ACCEPT; iptables -A FORWARD -i %i -d 10.30.0.0/16 -j ACCEPT; iptables -A FORWARD -o %i -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT; iptables -t nat -A POSTROUTING -s 10.99.0.0/24 -d 10.0.0.0/8 -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -d 10.10.0.0/16 -j ACCEPT; iptables -D FORWARD -i %i -d 10.20.0.0/16 -j ACCEPT; iptables -D FORWARD -i %i -d 10.30.0.0/16 -j ACCEPT; iptables -D FORWARD -o %i -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT; iptables -t nat -D POSTROUTING -s 10.99.0.0/24 -d 10.0.0.0/8 -j MASQUERADE
+[Peer]
+PublicKey = {{ vpn_client_public_key }}
+AllowedIPs = 10.99.0.2/32

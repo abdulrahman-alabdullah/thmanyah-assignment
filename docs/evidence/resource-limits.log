@@ -1,0 +1,5 @@
+UTC: 2026-09-30T06:25:18.126760+00:00
+COMMAND: docker inspect thmanyah-assessment-backend-1 --format restart={{.HostConfig.RestartPolicy.Name}} memory={{.HostConfig.Memory}} cpu={{.HostConfig.NanoCpus}} user={{.Config.User}} readonly={{.HostConfig.ReadonlyRootfs}}
+EXIT: 0
+
+restart=unless-stopped memory=268435456 cpu=750000000 user=app readonly=true

@@ -1,0 +1,4 @@
+UTC: 2026-09-30T06:31:01.842851+00:00
+COMMAND: docker compose exec -T db psql -U broadcast -d broadcast_restore -Atc SELECT count(*) FROM notes
+EXIT: 0
+3

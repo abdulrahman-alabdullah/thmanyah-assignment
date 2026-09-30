@@ -1,0 +1,21 @@
+[Unit]
+Description=Broadcast assessment application
+After=network-online.target
+Wants=network-online.target
+[Service]
+User=broadcast
+WorkingDirectory=/opt/broadcast
+Environment=DB_HOST=10.30.10.10
+Environment=DB_NAME=broadcast
+Environment=DB_USER=broadcast
+Environment=DB_PASSWORD_FILE=/opt/broadcast/db_password
+ExecStart=/opt/broadcast/venv/bin/gunicorn --bind 0.0.0.0:8000 --workers 2 --access-logfile - server:app
+Restart=on-failure
+RestartSec=3
+MemoryMax=512M
+CPUQuota=100%
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+[Install]
+WantedBy=multi-user.target

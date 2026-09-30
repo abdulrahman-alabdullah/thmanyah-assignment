@@ -1,0 +1,25 @@
+UTC: 2026-09-30T06:31:05.291041+00:00
+COMMAND: docker compose -f compose.s3.yaml logs --since 2026-09-30T06:31:02Z s3-worker nodered
+EXIT: 0
+s3-worker-1  | {"timestamp": "2026-09-30T06:31:02.270428+00:00", "event": "copy_started", "bytes": 14000000, "parts": 3, "part_size": 5242880, "concurrency": 8, "source_version": null}
+s3-worker-1  | {"timestamp": "2026-09-30T06:31:02.306497+00:00", "event": "part_completed", "part": 1, "bytes": 5242880}
+s3-worker-1  | {"timestamp": "2026-09-30T06:31:02.310818+00:00", "event": "part_completed", "part": 3, "bytes": 3514240}
+s3-worker-1  | {"timestamp": "2026-09-30T06:31:02.313776+00:00", "event": "part_completed", "part": 2, "bytes": 5242880}
+s3-worker-1  | {"timestamp": "2026-09-30T06:31:02.332771+00:00", "event": "copy_completed", "bytes": 14000000, "parts": 3, "seconds": 0.062, "mib_per_second": 214.17}
+nodered-1    | 30 Sep 06:31:02 - [info] [debug:Copy result and status] 
+nodered-1    | {
+nodered-1    |   _msgid: '49cbfc9401e2f91f',
+nodered-1    |   payload: { bytes: 14000000, mib_per_second: 214.17, parts: 3, seconds: 0.062 },
+nodered-1    |   statusCode: 200,
+nodered-1    |   headers: {
+nodered-1    |     server: 'gunicorn',
+nodered-1    |     date: 'Wed, 30 Sep 2026 06:31:02 GMT',
+nodered-1    |     connection: 'close',
+nodered-1    |     'content-type': 'application/json',
+nodered-1    |     'content-length': '69',
+nodered-1    |     'x-node-red-request-node': 'fa4e0bde'
+nodered-1    |   },
+nodered-1    |   responseUrl: 'http://s3-worker:9000/copy',
+nodered-1    |   redirectList: [],
+nodered-1    |   retry: 0
+nodered-1    | }

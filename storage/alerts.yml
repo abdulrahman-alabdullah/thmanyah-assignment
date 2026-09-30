@@ -1,0 +1,30 @@
+groups:
+  - name: storage-service
+    rules:
+      - alert: ShareUnavailable
+        expr: share_probe_success == 0
+        for: 30s
+        labels: {severity: critical}
+        annotations:
+          summary: SMB write and read probe is failing
+          description: Check server reachability, credentials, mount and backing storage.
+      - alert: ShareProbeSlow
+        expr: share_probe_duration_seconds > 2
+        for: 2m
+        labels: {severity: warning}
+        annotations: {summary: SMB probe takes more than two seconds}
+      - alert: ShareCapacityLow
+        expr: share_available_bytes / share_total_bytes < 0.15
+        for: 5m
+        labels: {severity: warning}
+        annotations: {summary: SMB share has less than 15 percent available capacity}
+      - alert: StorageExporterMissing
+        expr: up{job="share-probe"} == 0
+        for: 30s
+        labels: {severity: critical}
+        annotations: {summary: Storage probe exporter cannot be reached}
+      - alert: LinuxDiskBusy
+        expr: rate(node_disk_io_time_seconds_total[5m]) > 0.8
+        for: 5m
+        labels: {severity: warning}
+        annotations: {summary: Linux block device is busy over 80 percent of the interval}

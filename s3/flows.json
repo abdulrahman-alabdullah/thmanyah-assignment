@@ -1,0 +1,7 @@
+[
+ {"id":"copy-flow","type":"tab","label":"S3 multipart copy","disabled":false,"info":"Local demo. Press Copy to call the multipart worker. Credentials stay in the SDK credential chain."},
+ {"id":"copy-trigger","type":"inject","z":"copy-flow","name":"Copy configured object","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"payload":"","payloadType":"str","x":170,"y":120,"wires":[["worker-http"]]},
+ {"id":"worker-http","type":"http request","z":"copy-flow","name":"Multipart worker","method":"POST","ret":"obj","paytoqs":"ignore","url":"http://s3-worker:9000/copy","tls":"","persist":false,"proxy":"","insecureHTTPParser":false,"authType":"","senderr":false,"headers":[],"x":420,"y":120,"wires":[["copy-result"]]},
+ {"id":"copy-result","type":"debug","z":"copy-flow","name":"Copy result and status","active":true,"tosidebar":true,"console":true,"tostatus":false,"complete":"true","targetType":"full","x":660,"y":120,"wires":[]},
+ {"id":"copy-catch","type":"catch","z":"copy-flow","name":"Capture failures","scope":null,"uncaught":false,"x":180,"y":200,"wires":[["copy-result"]]}
+]

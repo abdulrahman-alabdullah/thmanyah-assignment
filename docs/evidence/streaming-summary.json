@@ -1,0 +1,14 @@
+{
+  "video_codec": "hevc",
+  "resolution": "1920x1080",
+  "fps": 25,
+  "audio_codec": "aac",
+  "configured_video_bps": 12000000,
+  "configured_audio_bps": 192000,
+  "measured_elementary_bps": {
+    "video": 12025571,
+    "audio": 194565
+  },
+  "container_bps": 12524162,
+  "aws_transmission": "not executed"
+}

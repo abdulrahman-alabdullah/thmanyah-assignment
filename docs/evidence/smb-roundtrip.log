@@ -1,0 +1,52 @@
+UTC: 2026-09-30T06:25:19.212087+00:00
+COMMAND: docker compose -f compose.storage.yaml exec -T client sh -c printf "assessment round trip\n" > /mnt/media/round-trip.txt; sync; cat /mnt/media/round-trip.txt; cat /proc/fs/cifs/DebugData
+EXIT: 0
+
+assessment round trip
+Display Internal CIFS Data Structures for Debugging
+---------------------------------------------------
+CIFS Version 2.59
+Features: DFS,FSCACHE,STATS,DEBUG,XATTR,ACL
+CIFSMaxBufSize: 16384
+Active VFS Requests: 0
+
+Servers: 
+1) ConnectionId: 0x1 Hostname: samba 
+ClientGUID: 365C3E8E-D12F-264B-B44D-05831E843F90
+Number of credits: 8190,1,1 Dialect 0x311
+Server capabilities: 0x30006f
+TCP status: 1 Instance: 1
+Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0 Net namespace: 4026533652 
+In Send: 0 In MaxReq Wait: 0
+Compression: no built-in support
+Encryption: Negotiated cipher (AES128-GCM)
+
+	Sessions: 
+	1) Address: 172.21.0.2 Uses: 1 Capability: 0x30006f	Session Status: 1 
+	Security type: RawNTLMSSP  SessionId: 0xc94ec4f2 encrypted
+	User: 0 Cred User: 0
+
+	Shares: 
+	0) IPC: \\samba\IPC$ Mounts: 1 DevInfo: 0x0 Attributes: 0x0
+	PathComponentMax: 0 Status: 1 type: 0 Serial Number: 0x0 encrypted
+	Share Capabilities: None	Share Flags: 0x8000
+	tid: 0xe46ddeca	Maximal Access: 0x1f00a9
+
+	1) \\samba\media Mounts: 1 DevInfo: 0x20 Attributes: 0x1006f
+	PathComponentMax: 255 Status: 1 type: DISK Serial Number: 0xce5a1e83 encrypted
+	Share Capabilities: None Aligned, Partition Aligned,	Share Flags: 0x8000
+	tid: 0xb36fef8a	Optimal sector size: 0x200	Maximal Access: 0x1f01ff
+
+
+	Server interfaces: 1	Last updated: 360 seconds ago
+	1)	Speed: 10Gbps
+		Capabilities: None
+		IPv4: 172.21.0.2
+		Weight (cur,total): (1,1)
+		Allocated channels: 1
+		[CONNECTED]
+
+
+	MIDs: 
+--
+

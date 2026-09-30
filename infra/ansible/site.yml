@@ -1,0 +1,136 @@
+---
+- name: Common host setup
+  hosts: all
+  become: true
+  tasks:
+    - name: Wait for instance initialization
+      ansible.builtin.command: cloud-init status --wait
+      changed_when: false
+    - name: Install baseline tools
+      ansible.builtin.apt:
+        name: [python3, python3-venv, curl, ca-certificates, acl]
+        update_cache: true
+        cache_valid_time: 3600
+
+- name: Configure database tier
+  hosts: dbs
+  become: true
+  vars_files: [vault.yml]
+  tasks:
+    - name: Install PostgreSQL
+      ansible.builtin.apt:
+        name: [postgresql, python3-psycopg2]
+    - name: Listen on the private address
+      ansible.builtin.lineinfile:
+        path: /etc/postgresql/16/main/postgresql.conf
+        regexp: '^#?listen_addresses\s*='
+        line: "listen_addresses = '{{ ansible_host }}'"
+      notify: Restart database
+    - name: Allow only the application database user from application host
+      ansible.builtin.lineinfile:
+        path: /etc/postgresql/16/main/pg_hba.conf
+        line: 'host broadcast broadcast 10.20.10.10/32 scram-sha-256'
+      notify: Restart database
+    - name: Ensure PostgreSQL starts on boot
+      ansible.builtin.systemd:
+        name: postgresql
+        enabled: true
+        state: started
+    - name: Create application role
+      become_user: postgres
+      community.postgresql.postgresql_user:
+        name: broadcast
+        password: '{{ db_password }}'
+      no_log: true
+    - name: Create application database
+      become_user: postgres
+      community.postgresql.postgresql_db:
+        name: broadcast
+        owner: broadcast
+  handlers:
+    - name: Restart database
+      ansible.builtin.systemd: {name: postgresql, state: restarted}
+
+- name: Configure application tier
+  hosts: apps
+  become: true
+  vars_files: [vault.yml]
+  tasks:
+    - name: Create application user
+      ansible.builtin.user: {name: broadcast, system: true, create_home: false}
+    - name: Create application directory
+      ansible.builtin.file: {path: /opt/broadcast, state: directory, owner: broadcast, mode: '0750'}
+    - name: Copy application source
+      ansible.builtin.copy:
+        src: '{{ item }}'
+        dest: '/opt/broadcast/{{ item | basename }}'
+        owner: broadcast
+        mode: '0640'
+      loop: ['../../app/server.py', '../../app/requirements.txt']
+      notify: Restart application
+    - name: Install application requirements in a virtual environment
+      ansible.builtin.pip:
+        requirements: /opt/broadcast/requirements.txt
+        virtualenv: /opt/broadcast/venv
+        virtualenv_command: python3 -m venv
+      notify: Restart application
+    - name: Write database credential
+      ansible.builtin.copy:
+        content: '{{ db_password }}'
+        dest: /opt/broadcast/db_password
+        owner: broadcast
+        mode: '0400'
+      no_log: true
+      notify: Restart application
+    - name: Install application service
+      ansible.builtin.template:
+        src: app.service.j2
+        dest: /etc/systemd/system/broadcast.service
+        mode: '0644'
+      notify: Restart application
+    - name: Enable application service
+      ansible.builtin.systemd: {name: broadcast, enabled: true, state: started, daemon_reload: true}
+  handlers:
+    - name: Restart application
+      ansible.builtin.systemd: {name: broadcast, state: restarted, daemon_reload: true}
+
+- name: Configure reverse proxy and private VPN
+  hosts: proxy
+  become: true
+  vars_files: [vault.yml]
+  tasks:
+    - name: Install edge packages
+      ansible.builtin.apt: {name: [nginx, wireguard, iptables]}
+    - name: Enable IPv4 forwarding
+      ansible.posix.sysctl: {name: net.ipv4.ip_forward, value: '1', sysctl_set: true, reload: true}
+    - name: Create server private key once
+      ansible.builtin.shell: 'umask 077; wg genkey > /etc/wireguard/server.key'
+      args: {creates: /etc/wireguard/server.key}
+      no_log: true
+    - name: Read server private key
+      ansible.builtin.slurp: {src: /etc/wireguard/server.key}
+      register: wireguard_server_key
+      no_log: true
+    - name: Install VPN configuration
+      ansible.builtin.template:
+        src: wg0.conf.j2
+        dest: /etc/wireguard/wg0.conf
+        mode: '0600'
+      no_log: true
+      notify: Restart VPN
+    - name: Enable WireGuard
+      ansible.builtin.systemd: {name: wg-quick@wg0, enabled: true, state: started}
+    - name: Configure Nginx
+      ansible.builtin.template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+        mode: '0644'
+        validate: /usr/sbin/nginx -t -c %s
+      notify: Restart proxy
+    - name: Enable Nginx
+      ansible.builtin.systemd: {name: nginx, enabled: true, state: started}
+  handlers:
+    - name: Restart VPN
+      ansible.builtin.systemd: {name: wg-quick@wg0, state: restarted}
+    - name: Restart proxy
+      ansible.builtin.systemd: {name: nginx, state: reloaded}

@@ -1,0 +1,4 @@
+UTC: 2026-09-30T06:25:10.490509+00:00
+COMMAND: docker compose exec -T backend python -c import os, signal; os.kill(1, signal.SIGKILL)
+EXIT: 0
+

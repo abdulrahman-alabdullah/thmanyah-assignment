@@ -1,0 +1,8 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {"Effect":"Allow","Action":["s3:PutObject","s3:AbortMultipartUpload","s3:ListMultipartUploadParts"],"Resource":"arn:aws:s3:::REPLACE_BUCKET/recordings/*"},
+    {"Effect":"Allow","Action":["s3:GetBucketLocation","s3:ListBucket"],"Resource":"arn:aws:s3:::REPLACE_BUCKET"},
+    {"Effect":"Allow","Action":"secretsmanager:GetSecretValue","Resource":"REPLACE_SRT_SECRET_ARN"}
+  ]
+}

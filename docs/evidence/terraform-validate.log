@@ -1,0 +1,6 @@
+UTC: 2026-09-30T06:32:14.092964+00:00
+COMMAND: docker run --rm -v /Users/abdulrahman/Desktop/thmanyah/infra:/work -w /work hashicorp/terraform:1.14.7 validate -no-color
+EXIT: 0
+
+Success! The configuration is valid.
+

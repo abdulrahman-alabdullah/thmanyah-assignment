@@ -1,0 +1,4 @@
+UTC: 2026-09-30T06:31:48.805720+00:00
+COMMAND: docker compose -f compose.storage.yaml exec -T client mount -t cifs //samba/media /mnt/media -o credentials=/tmp/smb-credentials,vers=3.1.1,seal,nosuid,nodev,noexec
+EXIT: 0
+

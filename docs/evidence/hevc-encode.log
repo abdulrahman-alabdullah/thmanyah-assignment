@@ -1,0 +1,183 @@
+UTC: 2026-09-30T06:32:11.384965+00:00
+COMMAND: docker run --rm --cpus=2 --memory=1g -v /Users/abdulrahman/Desktop/thmanyah/docs/evidence:/evidence thmanyah-streaming
+EXIT: 0
+
+Input #0, lavfi, from 'testsrc2=size=1920x1080:rate=25':
+  Duration: N/A, start: 0.000000, bitrate: N/A
+  Stream #0:0: Video: wrapped_avframe, yuv420p, 1920x1080 [SAR 1:1 DAR 16:9], 25 fps, 25 tbr, 25 tbn
+Input #1, lavfi, from 'anoisesrc=color=pink:sample_rate=48000:amplitude=0.2':
+  Duration: N/A, start: 0.000000, bitrate: 3072 kb/s
+  Stream #1:0: Audio: pcm_f64le, 48000 Hz, mono, dbl, 3072 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (wrapped_avframe (native) -> hevc (libx265))
+  Stream #1:0 -> #0:1 (pcm_f64le (native) -> aac (native))
+Press [q] to stop, [?] for help
+x265 [info]: HEVC encoder version 4.1+1-1d117be
+x265 [info]: build info [Linux][GCC 14.2.0][64 bit] 8bit+10bit+12bit
+x265 [info]: using cpu capabilities: NEON Neon_DotProd Neon_I8MM
+x265 [info]: Main profile, Level-4 (High tier)
+x265 [info]: Thread pool created using 2 threads
+x265 [info]: Slices                              : 1
+x265 [info]: frame threads / pool features       : 1 / wpp(34 rows)
+x265 [error]: unable to set thread affinity for NUMA node mask
+x265 [error]: unable to set thread affinity for NUMA node mask
+x265 [error]: unable to set thread affinity for NUMA node mask
+x265 [info]: Coding QT: max CU size, min CU size : 32 / 16
+x265 [info]: Residual QT: max TU size, max depth : 32 / 1 inter / 1 intra
+x265 [info]: ME / range / subpel / merge         : dia / 57 / 0 / 2
+x265 [info]: Lookahead / bframes / badapt        : 5 / 3 / 0
+x265 [info]: b-pyramid / weightp / weightb       : 1 / 0 / 0
+x265 [info]: References / ref-limit  cu / depth  : 1 / off / off
+x265 [info]: AQ: mode / str / qg-size / cu-tree  : 1 / 0.0 / 32 / 1
+x265 [info]: Rate Control / qCompress            : ABR-12000 kbps / 0.60
+x265 [info]: VBV/HRD buffer / max-rate / init    : 24000 / 12000 / 0.750
+x265 [info]: tools: rd=2 psy-rd=2.00 early-skip rskip mode=1 tmvp fast-intra
+x265 [info]: tools: strong-intra-smoothing lslices=6 deblock
+Output #0, mpegts, to '/evidence/local-hevc.ts':
+  Metadata:
+    encoder         : Lavf61.7.103
+  Stream #0:0: Video: hevc, yuv420p(tv, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 12000 kb/s, 25 fps, 90k tbn
+      Metadata:
+        encoder         : Lavc61.19.101 libx265
+      Side data:
+        cpb: bitrate max/min/avg: 12000000/0/12000000 buffer size: 24000000 vbv_delay: N/A
+  Stream #0:1: Audio: aac (LC), 48000 Hz, stereo, fltp, 192 kb/s
+      Metadata:
+        encoder         : Lavc61.19.101 aac
+frame=   22 fps=0.0 q=23.2 size=    1280KiB time=00:00:00.80 bitrate=13107.2kbits/s speed= 1.6x    
+frame=   53 fps= 53 q=23.2 size=    3072KiB time=00:00:02.04 bitrate=12336.2kbits/s speed=2.04x    
+frame=   86 fps= 57 q=25.0 size=    5120KiB time=00:00:03.36 bitrate=12483.0kbits/s speed=2.24x    
+frame=  118 fps= 59 q=23.4 size=    7168KiB time=00:00:04.56 bitrate=12862.2kbits/s speed=2.28x    
+frame=  149 fps= 59 q=25.0 size=    8960KiB time=00:00:05.82 bitrate=12603.1kbits/s speed=2.32x    
+frame=  177 fps= 59 q=25.0 size=   10752KiB time=00:00:07.00 bitrate=12582.9kbits/s speed=2.33x    
+frame=  205 fps= 58 q=25.0 size=   12544KiB time=00:00:08.12 bitrate=12655.2kbits/s speed=2.31x    
+frame=  236 fps= 59 q=25.0 size=   14336KiB time=N/A bitrate=N/A speed=N/A    
+[out#0/mpegts @ 0xaaab2130b520] video:14678KiB audio:235KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 2.736082%
+frame=  250 fps= 59 q=24.0 Lsize=   15321KiB time=00:00:09.92 bitrate=12652.1kbits/s speed=2.35x    
+x265 [info]: frame I:      5, Avg QP:20.56  kb/s: 20963.16
+x265 [info]: frame P:     61, Avg QP:23.33  kb/s: 15774.70
+x265 [info]: frame B:    184, Avg QP:24.71  kb/s: 10520.71
+
+encoded 250 frames in 4.21s (59.36 fps), 12011.54 kb/s, Avg QP:24.29
+[aac @ 0xaaab2130ecc0] Qavg: 442.302
+{
+    "streams": [
+        {
+            "index": 0,
+            "codec_name": "hevc",
+            "codec_long_name": "H.265 / HEVC (High Efficiency Video Coding)",
+            "profile": "Main",
+            "codec_type": "video",
+            "codec_tag_string": "HEVC",
+            "codec_tag": "0x43564548",
+            "width": 1920,
+            "height": 1080,
+            "coded_width": 1920,
+            "coded_height": 1088,
+            "closed_captions": 0,
+            "film_grain": 0,
+            "has_b_frames": 2,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuv420p",
+            "level": 120,
+            "color_range": "tv",
+            "chroma_location": "left",
+            "refs": 1,
+            "view_ids_available": "",
+            "view_pos_available": "",
+            "ts_id": "1",
+            "ts_packetsize": "188",
+            "id": "0x100",
+            "r_frame_rate": "25/1",
+            "avg_frame_rate": "25/1",
+            "time_base": "1/90000",
+            "start_pts": 133200,
+            "start_time": "1.480000",
+            "duration_ts": 900000,
+            "duration": "10.000000",
+            "extradata_size": 96,
+            "disposition": {
+                "default": 0,
+                "dub": 0,
+                "original": 0,
+                "comment": 0,
+                "lyrics": 0,
+                "karaoke": 0,
+                "forced": 0,
+                "hearing_impaired": 0,
+                "visual_impaired": 0,
+                "clean_effects": 0,
+                "attached_pic": 0,
+                "timed_thumbnails": 0,
+                "non_diegetic": 0,
+                "captions": 0,
+                "descriptions": 0,
+                "metadata": 0,
+                "dependent": 0,
+                "still_image": 0,
+                "multilayer": 0
+            }
+        },
+        {
+            "index": 1,
+            "codec_name": "aac",
+            "codec_long_name": "AAC (Advanced Audio Coding)",
+            "profile": "LC",
+            "codec_type": "audio",
+            "codec_tag_string": "[15][0][0][0]",
+            "codec_tag": "0x000f",
+            "sample_fmt": "fltp",
+            "sample_rate": "48000",
+            "channels": 2,
+            "channel_layout": "stereo",
+            "bits_per_sample": 0,
+            "initial_padding": 0,
+            "ts_id": "1",
+            "ts_packetsize": "188",
+            "id": "0x101",
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/90000",
+            "start_pts": 131280,
+            "start_time": "1.458667",
+            "duration_ts": 894720,
+            "duration": "9.941333",
+            "bit_rate": "194305",
+            "disposition": {
+                "default": 0,
+                "dub": 0,
+                "original": 0,
+                "comment": 0,
+                "lyrics": 0,
+                "karaoke": 0,
+                "forced": 0,
+                "hearing_impaired": 0,
+                "visual_impaired": 0,
+                "clean_effects": 0,
+                "attached_pic": 0,
+                "timed_thumbnails": 0,
+                "non_diegetic": 0,
+                "captions": 0,
+                "descriptions": 0,
+                "metadata": 0,
+                "dependent": 0,
+                "still_image": 0,
+                "multilayer": 0
+            }
+        }
+    ],
+    "format": {
+        "filename": "/evidence/local-hevc.ts",
+        "nb_streams": 2,
+        "nb_programs": 1,
+        "nb_stream_groups": 0,
+        "format_name": "mpegts",
+        "format_long_name": "MPEG-TS (MPEG-2 Transport Stream)",
+        "start_time": "1.458667",
+        "duration": "10.021333",
+        "size": "15688600",
+        "bit_rate": "12524162",
+        "probe_score": 50
+    }
+}

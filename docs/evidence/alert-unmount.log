@@ -1,0 +1,4 @@
+UTC: 2026-09-30T06:30:57.454469+00:00
+COMMAND: docker compose -f compose.storage.yaml exec -T client umount /mnt/media
+EXIT: 0
+

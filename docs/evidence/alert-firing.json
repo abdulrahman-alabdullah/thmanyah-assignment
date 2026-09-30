@@ -1,0 +1,22 @@
+{
+  "status": "success",
+  "data": {
+    "alerts": [
+      {
+        "labels": {
+          "alertname": "ShareUnavailable",
+          "instance": "client:9101",
+          "job": "share-probe",
+          "severity": "critical"
+        },
+        "annotations": {
+          "description": "Check server reachability, credentials, mount and backing storage.",
+          "summary": "SMB write and read probe is failing"
+        },
+        "state": "firing",
+        "activeAt": "2026-09-30T06:31:16.196767645Z",
+        "value": "0e+00"
+      }
+    ]
+  }
+}

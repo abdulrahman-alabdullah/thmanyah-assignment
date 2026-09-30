@@ -1,0 +1,11 @@
+UTC: 2026-09-30T06:25:11.416677+00:00
+COMMAND: docker compose up -d --force-recreate backend
+EXIT: 0
+
+ Container thmanyah-assessment-db-1 Running 
+ Container thmanyah-assessment-backend-1 Recreate 
+ Container thmanyah-assessment-backend-1 Recreated 
+ Container thmanyah-assessment-db-1 Waiting 
+ Container thmanyah-assessment-db-1 Healthy 
+ Container thmanyah-assessment-backend-1 Starting 
+ Container thmanyah-assessment-backend-1 Started 

@@ -1,0 +1,34 @@
+UTC: 2026-09-30T06:25:23.151418+00:00
+COMMAND: docker compose -f compose.storage.yaml run --rm xfs
+EXIT: 0
+
+ Container thmanyah-storage-xfs-run-18b1197a4fe7 Creating 
+ Container thmanyah-storage-xfs-run-18b1197a4fe7 Created 
+meta-data=/dev/loop0             isize=512    agcount=15, agsize=35791394 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=1, rmapbt=1
+         =                       reflink=1    bigtime=1 inobtcount=1 nrext64=1
+         =                       exchange=0   metadir=0
+data     =                       bsize=4096   blocks=536870910, imaxpct=5
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0, ftype=1, parent=0
+log      =internal log           bsize=4096   blocks=262143, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+         =                       rgcount=0    rgsize=0 extents
+Discarding blocks...Done.
+meta-data=/dev/loop0             isize=512    agcount=15, agsize=35791394 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=1, rmapbt=1
+         =                       reflink=1    bigtime=1 inobtcount=1 nrext64=1
+         =                       exchange=0   metadir=0
+data     =                       bsize=4096   blocks=536870910, imaxpct=5
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0, ftype=1, parent=0
+log      =internal log           bsize=4096   blocks=262143, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+         =                       rgcount=0    rgsize=0 extents
+logical_bytes=1099511627776 allocated_blocks=0
+0	/tmp/assessment-xfs-mount-33ZvZm/one-tib-sparse.bin
+PASS: 1 TiB logical file on XFS. This is a sparse metadata test, not 1 TiB of written data.

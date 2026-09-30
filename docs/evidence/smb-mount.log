@@ -1,0 +1,6 @@
+UTC: 2026-09-30T06:25:19.141851+00:00
+COMMAND: docker compose -f compose.storage.yaml exec -T client findmnt /mnt/media
+EXIT: 0
+
+TARGET     SOURCE        FSTYPE OPTIONS
+/mnt/media //samba/media cifs   rw,nosuid,nodev,noexec,relatime,vers=3.1.1,cache=strict,upcall_target=app,username=media,uid=0,forceuid,gid=0,forcegid,addr=172.21.0.2,file_mode=0755,dir_mode=0755,seal,soft,nounix,serverino,mapposix,reparse=nfs,nativesocket,symlink=native,rsize=4194304,wsize=4194304,bsize=1048576,echo_interval=60,actimeo=1,closetimeo=1

@@ -1,0 +1,4 @@
+UTC: 2026-09-30T06:31:02.173398+00:00
+COMMAND: docker inspect thmanyah-oom-proof --format oom={{.State.OOMKilled}} exit={{.State.ExitCode}} limit={{.HostConfig.Memory}}
+EXIT: 0
+oom=true exit=137 limit=67108864

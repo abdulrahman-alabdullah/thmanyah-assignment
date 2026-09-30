@@ -1,0 +1,8 @@
+UTC: 2026-09-30T06:25:10.315722+00:00
+COMMAND: docker compose ps
+EXIT: 0
+
+NAME                             IMAGE                          COMMAND                  SERVICE    CREATED          STATUS                    PORTS
+thmanyah-assessment-backend-1    thmanyah-assessment-backend    "gunicorn --bind 0.0…"   backend    17 minutes ago   Up 16 minutes (healthy)   8000/tcp
+thmanyah-assessment-db-1         postgres:17-alpine             "docker-entrypoint.s…"   db         17 minutes ago   Up 17 minutes (healthy)   5432/tcp
+thmanyah-assessment-frontend-1   thmanyah-assessment-frontend   "/docker-entrypoint.…"   frontend   17 minutes ago   Up 16 minutes             127.0.0.1:8080->80/tcp

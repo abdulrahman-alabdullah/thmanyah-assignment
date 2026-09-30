@@ -1,0 +1,104 @@
+{
+  "Name": "assessment-hevc-archive",
+  "ChannelClass": "SINGLE_PIPELINE",
+  "RoleArn": "arn:aws:iam::123456789012:role/assessment-medialive",
+  "InputSpecification": {
+    "Codec": "HEVC",
+    "MaximumBitrate": "MAX_20_MBPS",
+    "Resolution": "HD"
+  },
+  "InputAttachments": [
+    {
+      "InputId": "REPLACE_AFTER_CREATE_INPUT",
+      "InputAttachmentName": "hevc-source",
+      "InputSettings": {
+        "AudioSelectors": [
+          {
+            "Name": "audio-default"
+          }
+        ]
+      }
+    }
+  ],
+  "Destinations": [
+    {
+      "Id": "archive",
+      "Settings": [
+        {
+          "Url": "s3://assessment-example-archive/recordings/broadcast"
+        }
+      ]
+    }
+  ],
+  "EncoderSettings": {
+    "TimecodeConfig": {
+      "Source": "SYSTEMCLOCK"
+    },
+    "AudioDescriptions": [
+      {
+        "Name": "aac-192",
+        "AudioSelectorName": "audio-default",
+        "CodecSettings": {
+          "AacSettings": {
+            "Bitrate": 192000,
+            "CodingMode": "CODING_MODE_2_0",
+            "SampleRate": 48000,
+            "Profile": "LC",
+            "RateControlMode": "CBR",
+            "Spec": "MPEG4"
+          }
+        }
+      }
+    ],
+    "VideoDescriptions": [
+      {
+        "Name": "hevc-hd",
+        "Width": 1920,
+        "Height": 1080,
+        "CodecSettings": {
+          "H265Settings": {
+            "Bitrate": 12000000,
+            "FramerateNumerator": 25,
+            "FramerateDenominator": 1,
+            "RateControlMode": "CBR",
+            "GopSize": 2,
+            "GopSizeUnits": "SECONDS",
+            "Profile": "MAIN",
+            "Tier": "MAIN"
+          }
+        }
+      }
+    ],
+    "OutputGroups": [
+      {
+        "Name": "S3 TS archive",
+        "OutputGroupSettings": {
+          "ArchiveGroupSettings": {
+            "Destination": {
+              "DestinationRefId": "archive"
+            },
+            "RolloverInterval": 60
+          }
+        },
+        "Outputs": [
+          {
+            "OutputName": "hevc-ts",
+            "VideoDescriptionName": "hevc-hd",
+            "AudioDescriptionNames": [
+              "aac-192"
+            ],
+            "OutputSettings": {
+              "ArchiveOutputSettings": {
+                "NameModifier": "_hd",
+                "Extension": "ts",
+                "ContainerSettings": {
+                  "M2tsSettings": {}
+                }
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

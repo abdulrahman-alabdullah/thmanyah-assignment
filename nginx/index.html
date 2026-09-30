@@ -1,0 +1,12 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Broadcast infrastructure lab</title><style>
+body{font:17px system-ui;background:#f5f1e8;color:#252723;margin:0}main{max-width:850px;margin:8vh auto;padding:28px}h1{font-size:42px;letter-spacing:-1.5px}small{color:#62675e}form{display:flex;gap:12px;margin:32px 0}input{flex:1;padding:16px;font:inherit;border:1px solid #aaa;border-radius:6px}button{background:#284737;color:white;border:0;border-radius:6px;padding:14px;font:inherit}li{padding:16px;border-bottom:1px solid #ccc}#status{margin:20px 0}code{font-size:14px}
+</style><main><small>THMANYAH · INFRASTRUCTURE ASSESSMENT</small><h1>Broadcast operations notebook</h1>
+<p>A working request through Nginx, the application, and PostgreSQL.</p><div id="status">Checking database connection…</div>
+<form id="form"><input id="message" maxlength="500" required placeholder="Write an operational note" aria-label="Operational note"><button>Save note</button></form><ul id="notes"></ul>
+<p><small>Only Nginx is exposed to the host. Application and database traffic use private Docker networks.</small></p></main>
+<script>
+async function refresh(){const r=await fetch('/api/notes');if(!r.ok)throw Error('Database temporarily unavailable');const rows=await r.json();document.querySelector('#notes').replaceChildren(...rows.map(n=>{const el=document.createElement('li');el.textContent=n.message+' · '+n.created_at;return el}));document.querySelector('#status').textContent='Database connected · '+rows.length+' recent notes'}
+document.querySelector('#form').onsubmit=async e=>{e.preventDefault();try{const r=await fetch('/api/notes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:document.querySelector('#message').value})});if(!r.ok)throw Error('Could not save note');document.querySelector('#message').value='';await refresh()}catch(e){document.querySelector('#status').textContent=e.message}};
+refresh().catch(e=>document.querySelector('#status').textContent=e.message);
+</script></html>

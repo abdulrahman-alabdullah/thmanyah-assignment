@@ -1,0 +1,13 @@
+all:
+  vars:
+    ansible_user: ubuntu
+  children:
+    proxy:
+      hosts:
+        gateway: {ansible_host: 203.0.113.10}
+    apps:
+      hosts:
+        application: {ansible_host: 10.20.10.10}
+    dbs:
+      hosts:
+        database: {ansible_host: 10.30.10.10}

@@ -1,0 +1,17 @@
+{
+  "Name": "assessment-hevc-srt",
+  "Type": "SRT_LISTENER",
+  "InputSecurityGroups": [
+    "REPLACE_AFTER_CREATE_SECURITY_GROUP"
+  ],
+  "RoleArn": "arn:aws:iam::123456789012:role/assessment-medialive",
+  "SrtSettings": {
+    "SrtListenerSettings": {
+      "Decryption": {
+        "Algorithm": "AES256",
+        "PassphraseSecretArn": "arn:aws:secretsmanager:eu-west-1:123456789012:secret:assessment-srt-example"
+      },
+      "MinimumLatency": 1000
+    }
+  }
+}

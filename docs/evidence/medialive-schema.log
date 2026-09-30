@@ -1,0 +1,6 @@
+UTC: 2026-09-30T06:32:12.117613+00:00
+COMMAND: docker run --rm --cpus=2 --memory=1g -v /Users/abdulrahman/Desktop/thmanyah/docs/evidence:/evidence thmanyah-streaming python render-config.py --bucket assessment-example-archive --role-arn arn:aws:iam::123456789012:role/assessment-medialive --secret-arn arn:aws:secretsmanager:eu-west-1:123456789012:secret:assessment-srt-example
+EXIT: 0
+
+CreateInput: SDK request schema PASS (input.json); no AWS resources created
+CreateChannel: SDK request schema PASS (channel.json); no AWS resources created

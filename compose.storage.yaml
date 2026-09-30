@@ -1,0 +1,44 @@
+name: thmanyah-storage
+services:
+  samba:
+    build: ./storage
+    image: thmanyah-storage-tools
+    command: [server]
+    secrets: [smb_password]
+    volumes: [media:/srv/media]
+    networks: [storage]
+    mem_limit: 256m
+    restart: unless-stopped
+  client:
+    image: thmanyah-storage-tools
+    command: [client]
+    # Required only for this isolated Linux mount demonstration inside Docker's VM.
+    privileged: true
+    secrets: [smb_password]
+    depends_on: [samba]
+    networks: [storage]
+    mem_limit: 256m
+    restart: unless-stopped
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    ports: ['127.0.0.1:9090:9090']
+    volumes:
+      - ./storage/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./storage/alerts.yml:/etc/prometheus/alerts.yml:ro
+    networks: [storage, ui]
+    mem_limit: 256m
+  xfs:
+    image: thmanyah-storage-tools
+    command: [xfs]
+    privileged: true
+    profiles: [filesystem]
+    mem_limit: 1g
+    networks: [storage]
+networks:
+  storage: {internal: true}
+  ui: {}
+volumes:
+  media: {}
+secrets:
+  smb_password:
+    file: ./secrets/smb_password.txt

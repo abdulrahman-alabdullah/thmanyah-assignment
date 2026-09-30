@@ -1,0 +1,9 @@
+{
+  "test": "recovery",
+  "process_crash": "PASS",
+  "backend_recreate": "PASS",
+  "db_failure_503": "PASS",
+  "named_volume_persistence": "PASS",
+  "marker_id": 3,
+  "timestamp": "2026-09-30T06:25:18.127076+00:00"
+}
