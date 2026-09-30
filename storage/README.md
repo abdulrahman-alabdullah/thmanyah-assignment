@@ -7,7 +7,7 @@
 3. Run `sudo mount -t cifs //WINDOWS_IP/media /mnt/windows-media -o credentials=/etc/smb-credentials,vers=3.1.1,seal,uid=1000,gid=1000,nosuid,nodev,noexec`. SMB is file access; the remote Windows filesystem remains owned and managed by Windows.
 4. Write a uniquely named file on Linux and read it on Windows, then write from Windows and read on Linux. Compare a SHA-256 digest for a larger file. Inspect `findmnt /mnt/windows-media`, `/proc/fs/cifs/DebugData`, and Windows `Get-SmbConnection` for dialect and encryption.
 5. Adapt the example fstab entry in `linux/windows-share.mount.example`. `_netdev` establishes network ordering and `x-systemd.automount` triggers mounting when the path is accessed. `nofail` prevents an unavailable share from blocking system boot; it does not guarantee the share is available to an application. Use `RequiresMountsFor=/mnt/windows-media` on any dependent systemd service and check readiness before writing.
-6. Run `sudo systemctl daemon-reload` and access the path. Reboot each host in the lab and repeat the bidirectional integrity check. Reboot validation on Windows and a systemd Linux host remains outstanding in this submission.
+6. Run `sudo systemctl daemon-reload` and access the path. In the temporary AWS lab, SMB 3.1.1 encryption and bidirectional file exchange passed, and Windows read the logical size of a 1 TiB Linux-created sparse file. The Windows `Z:` drive mapping did not reconnect after a full Windows reboot. The Linux fstab mount was not tested across a Linux host reboot. See `docs/evidence/aws-windows-reboot.log` and `docs/evidence/aws-linux-smb.log`.
 
 ## Linux share mounted on Windows
 

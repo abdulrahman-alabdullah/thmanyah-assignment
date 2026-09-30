@@ -1,6 +1,6 @@
 # MediaLive provisioning and archive verification
 
-Status: request files pass the installed AWS SDK schema check. No AWS resources have been created and no AWS runtime validation has been completed.
+Assessment acceptance status (30 September 2026): AWS accepted creation of the SRT listener input and single-pipeline HEVC/archive channel configuration. The channel remained IDLE and was deleted without being started, so live ingest, MediaLive output, and a real S3 archive were not verified. The temporary input, channel, secret, role, buckets, and stack have been removed. This guide is the procedure for a future live check; it creates billable resources.
 
 1. Choose a supported region and an S3 archive bucket with public access blocked and default encryption. Terraform's `media_buckets.archive` output provides a suitable bucket after deployment. The bucket name must contain no dots.
 2. Create a Secrets Manager secret containing the SRT passphrase as a plaintext secret value, not a JSON key/value object, as required by MediaLive's SRT integration. Secrets Manager still encrypts the stored value. Use a 10-79 character high-entropy value and keep it out of screenshots, Git and shell history. Record the ARN, not the secret value, in configuration.
@@ -46,6 +46,6 @@ aws medialive delete-channel --channel-id CHANNEL_ID
 aws medialive delete-input --input-id INPUT_ID
 ```
 
-The request schema check catches parameter names and required fields. It does not prove IAM permissions, input availability, region support, encoder compatibility or successful service-side channel creation.
+The request schema check catches parameter names and required fields. The service accepted the test channel configuration, but that does not prove ingest, encoder compatibility, successful output, or archive delivery. Do not claim the broadcast requirement as complete until an actual archived object has been inspected.
 
 Sources: [SRT listener setup](https://docs.aws.amazon.com/medialive/latest/ug/input-listener-srt-setup.html), [CLI create-input](https://docs.aws.amazon.com/cli/latest/reference/medialive/create-input.html), [MediaLive archive output](https://docs.aws.amazon.com/medialive/latest/ug/outputs-supported-containers-downstream-systems.html).

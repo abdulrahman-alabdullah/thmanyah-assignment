@@ -1,52 +1,62 @@
-# Thmanyah broadcast infrastructure assessment
+# Thmanyah infrastructure engineering assessment
 
-An English report and reproducible implementation of the assessment, prepared on an Apple Silicon Mac. See [the PDF report](docs/Thmanyah-Infrastructure-Assessment.pdf), [report source](docs/REPORT.md), and [actual local evidence](docs/evidence/).
+English implementation and evidence for the supplied broadcast infrastructure assessment. The report summarizes the design and results; the traceability guide maps each requested item to its code, run instructions, evidence, and current status.
 
-## Validation status
+## Start here
 
-| Requirement | Implementation and evidence |
-| --- | --- |
-| Storage mounts, monitoring and large files | AWS Windows/Linux SMB 3.1.1 encrypted read/write passed in both directions; Windows read the logical length of a 1 TiB sparse file. Its mapped drive did not reconnect after reboot. |
-| Docker application | Working Nginx/frontend, Python backend and PostgreSQL on separate networks; crash recovery, persistence, database outage, backup restore and isolated OOM checks executed. |
-| Multipart S3 transfer | Three-part AWS S3 copy and SHA-256 match passed; test buckets and objects were deleted. |
-| Terraform and Ansible | Three-VPC AWS stack deployed; VPN/private access, API read/write, database restore, and zero-change second Ansible run passed. The stack was destroyed afterward. |
-| HEVC broadcast and S3 archive | Local Full HD HEVC validation passed; AWS accepted MediaLive configuration, but the channel was not started and no archive was verified. |
-| Optional MSSQL | Omitted. PostgreSQL backup/restore is demonstrated for the required stack; it is not represented as MSSQL. |
+For a first review, read these in order:
+
+1. [Assessment report](docs/Thmanyah-Infrastructure-Assessment.pdf) for the design, results, limitations, and remaining acceptance checks.
+2. [Requirement-to-code traceability](docs/TRACEABILITY.md) to find the exact implementation and evidence for every task.
+3. [Local demonstration](docs/DEMO.md) for a short walkthrough, then use the task guides below to reproduce a specific test.
+
+The cloud stack was temporary and has been destroyed. The report is explicit about checks that passed, the Windows reboot mapping failure, and the incomplete OBS-to-MediaLive archive test.
+
+## Task map
+
+| Assessment task | Start with | Code and evidence | Current result |
+| --- | --- | --- | --- |
+| Windows/Linux storage, persistence, monitoring, alerts, and 1 TiB files | [Storage walkthrough](storage/README.md) | `storage/`, `docs/evidence/smb-*`, `docs/evidence/xfs-sparse.log`, and `docs/evidence/aws-*.log` | Local SMB/monitoring tests passed. AWS SMB worked both ways and Windows read a logical 1 TiB sparse file. Windows `Z:` mapping did not reconnect after reboot. |
+| Docker application, automation, secrets, recovery, and resource allocation | [Local run steps](#run-the-local-demonstration) and [traceability map](docs/TRACEABILITY.md#task-2-docker-application) | `compose.yaml`, `app/`, `nginx/`, `scripts/`; `docs/evidence/app-*`, `backend-*`, `database-*`, `oom-*`, `resource-limits.log` | Local functional, recovery, persistence, resource-limit, and PostgreSQL restore checks passed. |
+| Optional MSSQL database, backup, and restore | [Traceability map](docs/TRACEABILITY.md#optional-task-mssql) | No MSSQL implementation or evidence is included. | Optional task not implemented; PostgreSQL evidence is clearly identified as PostgreSQL. |
+| S3 multipart bucket-to-bucket copy and logs | [S3 implementation and status](docs/TRACEABILITY.md#task-3-s3-multipart-copy-through-node-red) | `s3/`, `tests/test_s3.py`, `docs/evidence/s3-tests.log`, `nodered-flow.log`, `aws-s3-multipart.log` | Local Moto and real three-part AWS copy checks passed; temporary AWS buckets and objects were removed. |
+| Three-VPC Terraform infrastructure, Ansible configuration, and VPN | [AWS deployment guide](infra/DEPLOY.md) | `infra/`, `infra/ansible/`; `docs/evidence/terraform-*`, `ansible-syntax.log`, `aws-acceptance.log`, `aws-ansible-idempotence.log`, `aws-database-restore.log` | Temporary AWS deployment, VPN/private access, app request, DB restore, and zero-change second Ansible run passed. The stack was destroyed. |
+| OBS/vMix HEVC broadcast to Elemental with S3 archive | [MediaLive guide](streaming/AWS.md) and [OBS settings](streaming/OBS.md) | `streaming/`, `docs/evidence/hevc-*`, `medialive-schema.log`, and report section 6 | Local HEVC/AAC generation passed and AWS accepted the channel configuration. No live ingest or S3 archive was verified. |
+
+The [traceability guide](docs/TRACEABILITY.md) has the detailed sub-requirement breakdown, exact commands, evidence filenames, and qualifications for every status.
 
 ## Run the local demonstration
 
-Prerequisites: Docker Desktop running, Compose v2, Python 3 for the host-side verification scripts, about 4 GB of spare Docker RAM and internet access for the first image builds. Commands below run from the repository root.
+Prerequisites: Docker Desktop, Docker Compose v2, Python 3, about 4 GB of Docker memory, and internet access for the first image builds. Run commands from the repository root.
 
 ```sh
 bash scripts/setup.sh
 docker compose up -d --build
 python3 scripts/smoke.py
+```
+
+The application is at <http://localhost:8080>. Start the independent S3 and storage labs when needed:
+
+```sh
 docker compose -f compose.s3.yaml up -d --build
 docker compose -f compose.storage.yaml up -d --build
+```
+
+When the S3 lab is running, Node-RED is at <http://localhost:1880>; when the storage lab is running, Prometheus is at <http://localhost:9090>. To run the S3 integrity test, run `python3 scripts/verify.py s3` after starting the S3 lab. In Node-RED, trigger **Copy configured object** to see the flow result. The worker uses S3-side multipart copy so object bytes do not pass through the worker.
+
+Run the other local acceptance checks after starting the related services:
+
+```sh
+python3 scripts/verify.py app storage alerts
 docker build -t thmanyah-streaming streaming
+python3 scripts/verify.py streaming
 ```
 
-- Application: <http://localhost:8080>
-- Node-RED: <http://localhost:1880>
-- Prometheus: <http://localhost:9090>
+The `storage` check creates and removes a temporary sparse loop image in Docker's Linux VM. It does not write 1 TiB or format a physical disk. These storage tests require a privileged container and an isolated lab. `streaming` builds a local HEVC test clip and verifies the encoded streams; it does not send a live broadcast to AWS.
 
-Seed the local S3 object and verify the copy:
+## Validate Terraform and Ansible locally
 
-```sh
-python3 scripts/verify.py s3
-```
-
-In Node-RED, click the small inject button beside **Copy configured object**. Its debug panel shows the result. The script's transfer uses server-side multipart copying and never loads the large object's bytes into the worker.
-
-## Run the remaining checks
-
-```sh
-python3 scripts/verify.py app storage alerts streaming
-```
-
-`app` briefly stops/recreates this assessment's containers. `alerts` briefly unmounts and restores this lab's share. `storage` creates and removes a temporary 2 TiB sparse loop image inside Docker's Linux VM and tests a 1 TiB sparse file; it does not write 1 TiB or format a physical disk. These storage demonstrations use privileged containers and belong in an isolated lab.
-
-For Terraform, download the tool and provider without AWS credentials, then validate:
+These checks do not create AWS resources:
 
 ```sh
 docker run --rm -v "$PWD/infra:/work" -w /work \
@@ -54,29 +64,26 @@ docker run --rm -v "$PWD/infra:/work" -w /work \
 python3 scripts/verify.py terraform
 ```
 
-With Ansible installed, `python3 scripts/extra-checks.py` checks syntax, restores PostgreSQL into a temporary database, triggers the actual Node-RED flow and proves an isolated 64 MB OOM limit. Backups remain private under the ignored `backups/` directory.
+With the application and S3 labs running, and Ansible plus its required collections installed, `python3 scripts/extra-checks.py` runs syntax checks, a PostgreSQL restore check, the Node-RED flow, and an isolated 64 MB OOM test. The actual AWS deployment procedure is in [infra/DEPLOY.md](infra/DEPLOY.md); its deployment commands create billable resources and require deliberate cleanup.
 
-## Deployment and submission
+## Stop the local demonstration
 
-- [AWS infrastructure and VPN deployment](infra/DEPLOY.md)
-- [MediaLive provisioning and archive checks](streaming/AWS.md)
-- [OBS encoder settings](streaming/OBS.md)
-- [Windows/Linux storage walkthrough](storage/README.md)
-- [Demonstration and interview notes](docs/DEMO.md)
-- [Final submission checklist](docs/SUBMISSION.md)
-
-The report distinguishes cloud tests from local demonstrations. Remaining gaps are Windows mapping recovery after reboot and a real OBS-to-MediaLive ingest/archive check. Temporary AWS resources have been cleaned up; see the report evidence index.
-
-Local credential files are in an owner-only directory and are ignored by Git. Compose file secrets are read-only mounts, not an encrypted secret manager. Use an IAM role for AWS S3 and an encrypted Ansible vault for server credentials. Do not publish state, plan files, credentials, private keys or database backups.
-
-Stop the demo without deleting its data:
+These commands stop and remove the demo containers and networks while preserving named data volumes:
 
 ```sh
-docker compose stop
-docker compose -f compose.s3.yaml stop
-docker compose -f compose.storage.yaml stop
+docker compose down
+docker compose -f compose.s3.yaml down
+docker compose -f compose.storage.yaml down
 ```
 
-## References
+Add `-v` only if you intentionally want to delete the local demo data volumes. AWS cleanup is separate; do not leave a test deployment running after acceptance checks.
 
-The supplied [public assessment repository](https://github.com/Alkhathami1/devops-tasks) was reviewed to compare scope and identify deployment considerations. Its code, report and execution evidence were not copied into this implementation. The supplied [Drive archive](https://drive.google.com/file/d/1P_T2nciGlpGpV2j-qM3Js4vdCLGwguEP/view) provided IBM Plex Sans Arabic fonts; their license is preserved under `docs/assets/`. Technical sources are linked in the report.
+## Submission and security
+
+- [Final submission checklist](docs/SUBMISSION.md)
+- [Interview walkthrough](docs/DEMO.md)
+- [Timestamped and summarized evidence](docs/evidence/README.md)
+
+Local credentials are stored in the ignored, owner-only `secrets/` directory. They are not managed or encrypted by Compose. Use IAM roles for AWS workloads and Ansible Vault for deployment secrets. Never commit credentials, `.tfvars`, Terraform state/plans, private keys, backups, SRT URLs containing passphrases, or unredacted host output. Check `git status` and inspect the generated archive before submission.
+
+The supplied [public assessment repository](https://github.com/Alkhathami1/devops-tasks) was reviewed as a reference; its code, report, and evidence were not copied. The supplied [Drive archive](https://drive.google.com/file/d/1P_T2nciGlpGpV2j-qM3Js4vdCLGwguEP/view) provided the IBM Plex Sans Arabic fonts; the font license is preserved under `docs/assets/`.

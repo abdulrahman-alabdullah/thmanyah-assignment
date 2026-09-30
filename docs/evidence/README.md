@@ -1,5 +1,7 @@
 # Evidence interpretation
 
+Use [the requirement traceability guide](../TRACEABILITY.md) to map each assessment item to its implementation, run steps, and evidence.
+
 These files record this implementation's actual local and short-lived AWS acceptance results on 30 September 2026. They are not copied from the public reference repository.
 
 The `verify.py` and `extra-checks.py` scripts capture local commands and outputs. JSON summaries record specific assertions. Linux services run inside Docker Desktop's VM; Moto emulates S3. The `aws-*` files summarize actual AWS tests. The AWS S3 transfer, application acceptance, Ansible idempotence, database restore and encrypted SMB checks ran on temporary resources that have since been deleted. The MediaLive input and channel were provisioned but never started, so there is no live ingest or archive evidence. `input.json` and `channel.json` are illustrative request templates, not deployed resources.

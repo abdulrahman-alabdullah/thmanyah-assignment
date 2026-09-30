@@ -9,6 +9,7 @@ __pycache__/
 *.pyc
 docs/evidence/*.ts
 docs/evidence/*.img
+docs/REPORT.html
 infra/ansible/inventory.yml
 infra/ansible/vault.yml
 *.pem

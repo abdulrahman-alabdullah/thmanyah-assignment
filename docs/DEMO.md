@@ -2,7 +2,9 @@
 
 ## Five-minute recording
 
-1. Open the README status table and state which checks ran locally and which require AWS/Windows access. This avoids suggesting that a schema check is a deployed system.
+Before recording, start the local application, S3, and storage services using the commands in the README. Confirm all three Compose projects report healthy, and review the evidence/traceability links.
+
+1. Open the README task map and `docs/TRACEABILITY.md`; explain which checks ran locally, which ran in AWS, which failed, and which remain incomplete. This avoids suggesting that a schema check is a deployed system.
 2. Open `http://localhost:8080`, save a note, reload and show it persists. Explain the path: Nginx → private backend → private PostgreSQL. Show `docker compose ps` and `docs/evidence/app-recovery.json`.
 3. Show the network and resource declarations in `compose.yaml`. Explain why the database has no published port, why it needs a persistent volume, and how the app returns a temporary 503 if it loses its database.
 4. Open Node-RED at port 1880 and trigger the copy. Show the debug output, three part completions and the SHA-256 test. Explain why server-side `UploadPartCopy` avoids downloading a large broadcast asset.
@@ -22,6 +24,6 @@
 - HEVC is a codec, MPEG-TS a container, SRT a transport, and S3 the archive destination. MediaLive's RTMP input supports H.264; this design uses SRT for HEVC.
 - BPP expresses bitrate per pixel per frame, not a guarantee of picture quality. Keep the assessment's 12 Mbps floor.
 
-## Completion order before the deadline
+## Remaining acceptance checks
 
-First review and understand the local application, S3 worker and evidence. Record the working local demo. If an AWS account becomes available in time, run the reviewed Terraform deployment, bootstrap the VPN, configure the private hosts and perform the live broadcast/real archive checks. Obtain Windows access to complete the bidirectional mount and reboot checks. Add the resulting evidence and revise the status table only after those tests pass.
+The AWS application, S3 multipart, VPN, Ansible idempotence, database restore, and bidirectional SMB checks have been exercised; their temporary cloud resources have been removed. The Windows `Z:` mapping failed its reboot reconnect check. The MediaLive channel configuration was accepted but kept IDLE, so no live broadcast or S3 archive has been verified. To close the remaining gaps, fix and retest the Windows credential/mapping behavior after reboot, then deploy a cost-reviewed temporary AWS stack, send an OBS HEVC stream to MediaLive, inspect an actual S3 `.ts` object, and clean up the stack. Update the report and traceability status only when the corresponding evidence passes.

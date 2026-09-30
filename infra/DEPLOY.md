@@ -1,6 +1,6 @@
 # AWS deployment procedure
 
-Status: Terraform validation and Ansible syntax checks were performed locally. No AWS plan, apply, instance configuration, VPN connectivity or idempotence test was performed. This procedure requires an AWS account and creates billable resources.
+Assessment acceptance status (30 September 2026): a reviewed Terraform deployment created the three VPCs and temporary test hosts in `eu-west-1`. VPN/private reachability, public application read/write, PostgreSQL restore, and a second Ansible run with zero changes passed. The test stack and its S3 buckets were then destroyed; no assessment VPCs, running instances, or NAT gateways remain. Evidence is indexed in `docs/TRACEABILITY.md`. The steps below explain how to reproduce a future deployment; they create billable resources and require a fresh cost review and cleanup.
 
 ## Prepare credentials and configuration
 
@@ -34,7 +34,7 @@ AllowedIPs = 10.10.0.0/16, 10.20.0.0/16, 10.30.0.0/16
 PersistentKeepalive = 25
 ```
 
-10. Activate the tunnel, confirm a recent handshake, and test SSH to `10.20.10.10` and `10.30.10.10`. Run the full playbook with the same key and vault password. Run it a second time and inspect the recap for unexpected changes. This second run is a required deployment acceptance check, not a result claimed by the local syntax check.
+10. Activate the tunnel, confirm a recent handshake, and test SSH to `10.20.10.10` and `10.30.10.10`. Run the full playbook with the same key and vault password. Run it a second time and inspect the recap for unexpected changes. The assessment deployment's second run reported zero changes on all three Linux hosts; a new deployment should repeat this check.
 
 ## Verify isolation and application behavior
 

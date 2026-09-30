@@ -1,8 +1,8 @@
 # OBS to AWS Elemental MediaLive
 
-Status: AWS procedure supplied; OBS and AWS end-to-end transmission have not been executed.
+Assessment acceptance status (30 September 2026): OBS was installed temporarily on Apple Silicon and the installed build exposed a VideoToolbox HEVC encoder. A local test clip and profile were prepared, but OBS output was not verified and no stream was sent to MediaLive. The local OBS application has since been removed. A live broadcast and S3 archive are still open acceptance checks.
 
-1. Install OBS Studio on macOS. Add a screen capture, camera or a moving test clip and an audio source. macOS may require screen-recording permission.
+1. Install OBS Studio from the [official download page](https://obsproject.com/download) on macOS. Add a screen capture, camera or a moving test clip and an audio source. macOS may require screen-recording permission.
 2. In Video, set canvas and output resolution to 1920 × 1080 and FPS to 25.
 3. Set Advanced Output. Select an HEVC encoder that the installed macOS OBS build exposes, preferably Apple VideoToolbox HEVC. Set video bitrate to 12000 kbps, keyframe interval to 2 seconds, AAC audio to 192 kbps, stereo at 48 kHz.
 4. Set Stream service to Custom. Use the allocated MediaLive SRT listener endpoint on port 5050, for example `srt://HOST:5050?mode=caller&latency=1000000&pbkeylen=32&passphrase=YOUR_PASSPHRASE`. Stream key stays empty. This URL contains a secret; do not include it in screenshots or logs.
