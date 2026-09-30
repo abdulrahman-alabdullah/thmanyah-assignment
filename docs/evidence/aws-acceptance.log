@@ -1,0 +1,6 @@
+Temporary AWS acceptance stack in eu-west-1 (2026-09-30)
+
+Three-VPC Terraform deployment completed. Public ingress host had a public address; application and database hosts had private addresses only. Root EBS volumes were encrypted.
+WireGuard client handshake succeeded. Private readiness URL returned {"status":"ready"} through the tunnel.
+Public application POST then GET returned the newly created acceptance marker.
+All temporary Linux and Windows instances and the three test VPCs were destroyed after testing.

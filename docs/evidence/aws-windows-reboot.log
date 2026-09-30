@@ -1,0 +1,3 @@
+Temporary Windows host passed EC2 system status checks after reboot.
+The saved Z: SMB mapping reported Status=Unavailable and did not reconnect.
+Result: reboot persistence check FAILED; reauthentication/remapping is required after reboot.

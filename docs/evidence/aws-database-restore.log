@@ -1,0 +1,6 @@
+Ansible backup/restore acceptance on the temporary AWS database host:
+
+Copied the live PostgreSQL database into a temporary restore target.
+Verified the AWS deployment acceptance marker in the restored database.
+Dropped the temporary restore target after the assertion passed.
+Recap: ok=6 changed=3 unreachable=0 failed=0.

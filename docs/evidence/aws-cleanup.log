@@ -1,0 +1,5 @@
+AWS cleanup completed for the tagged Thmanyah assessment stack.
+
+Terraform: Destroy complete; 10 tracked resources destroyed after prior partial teardown.
+Follow-up inventory in eu-west-1: no assessment-tagged VPCs, running instances, NAT gateways or S3 buckets.
+The assessment MediaLive channel and input reported DELETED; the temporary MediaLive and Windows IAM roles were absent.

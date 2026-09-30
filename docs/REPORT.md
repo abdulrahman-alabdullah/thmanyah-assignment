@@ -2,19 +2,19 @@
 
 Prepared for the infrastructure engineering assessment. Validation date: 30 September 2026. The implementation and recorded tests run on an Apple Silicon Mac using Docker Desktop's Linux virtual machine.
 
-The submission demonstrates an encrypted SMB mount with monitoring, a working three-container application, a Node-RED multipart copy workflow and a Full HD HEVC recording. It also supplies three-VPC AWS infrastructure, Ansible configuration and MediaLive request files. Local tests passed; AWS deployment, Windows interoperability and OBS-to-Elemental transmission remain unexecuted because the required environments were unavailable. The evidence below separates runtime results from configuration checks.
+The submission includes local application, monitoring, storage and streaming demonstrations, plus a short-lived AWS acceptance deployment. Real cloud checks covered a multipart S3 copy, three-VPC networking and VPN access, public application read/write, Ansible idempotence, database restore, encrypted SMB in both directions, and a 1 TiB logical sparse file read by Windows. The Windows drive mapping did not reconnect after reboot, and an OBS-to-MediaLive broadcast and S3 archive were not completed. All temporary AWS resources were removed after testing.
 
 ## 1 Requirement coverage and validation status
 
 | Requirement | Delivered | Validation performed |
 | --- | --- | --- |
-| Windows volume mounted on Linux and reverse direction | SMB design, Windows scripts, Linux mount/fstab instructions, Samba lab | Real Linux-to-Samba mount and encryption; Windows directions and host reboot tests remain outstanding |
+| Windows volume mounted on Linux and reverse direction | SMB design, Windows scripts, Linux mount/fstab instructions, Samba lab | AWS Windows-to-Linux and Linux-to-Windows authenticated, encrypted SMB 3.1.1 read/write passed; 1 TiB sparse-file logical length passed; Windows drive reconnect after reboot failed |
 | Filesystem supporting 1 TB per file | XFS loop-image demonstration and NTFS guidance | 1 TiB sparse file created on XFS; real allocated-capacity test not performed |
 | Monitoring and service alerts | Share probe, node exporter, Prometheus rules | Write/fsync/read probe, rule validation, alert firing and resolution executed; external paging not configured |
 | Docker application with isolated communication | Nginx/frontend, Python API, PostgreSQL, secrets, health checks and limits | Read/write, process crash, recreation, DB outage, volume persistence, OOM containment and backup restore executed |
-| S3 bucket-to-bucket multipart transfer | Python copy engine and Node-RED flow | Three-part local copy, SHA-256 equality, planning limits and failure cleanup; actual AWS S3 not tested |
-| Terraform and Ansible with three VPCs and VPN | AWS resources, inventory, vault templates, WireGuard and service configuration | Terraform format/validation and Ansible syntax passed; apply, VPN and idempotence remain outstanding |
-| Full HD HEVC broadcast to Elemental with S3 archive | Local TS encoder, OBS instructions, SRT/MediaLive request generator | Local media probe and SDK schema passed; real cloud ingest/archive not tested |
+| S3 bucket-to-bucket multipart transfer | Python copy engine and Node-RED flow | Three-part AWS multipart copy and SHA-256 equality passed; objects and buckets deleted after test |
+| Terraform and Ansible with three VPCs and VPN | AWS resources, inventory, vault templates, WireGuard and service configuration | Temporary three-VPC apply, VPN handshake/private reachability, public API, database restore, and second Ansible run (zero changes) passed; stack destroyed afterward |
+| Full HD HEVC broadcast to Elemental with S3 archive | Local TS encoder, OBS instructions, SRT/MediaLive request generator | MediaLive input/channel and OBS HEVC profile were prepared; channel was not started, so live ingest and S3 archive remain unverified; resources deleted |
 | Optional MSSQL | Not included | PostgreSQL backup/restore covers this application's recovery; it is not an MSSQL implementation |
 
 The repository holds implementation files and timestamped logs under `docs/evidence/`. It contains no cloud deployment evidence borrowed from another submission. For reproduction, start with the root README and the walkthroughs linked there.
@@ -43,14 +43,14 @@ uid=1000,gid=1000,nosuid,nodev,noexec
 
 4. Write from Linux and read the file on Windows. Write another file from Windows and read it on Linux. Compare SHA-256 hashes for a larger test file. Inspect Linux `findmnt` and CIFS debug data, and Windows `Get-SmbConnection`, for the negotiated dialect and encryption.
 5. Adapt `storage/linux/windows-share.mount.example` into `/etc/fstab`. `_netdev` establishes network ordering; `x-systemd.automount` mounts on access; `nofail` lets the host boot if the server is unavailable. These settings do not make the share continuously available. Add `RequiresMountsFor=/mnt/windows-media` and an application readiness check for services that must use it.
-6. Reload systemd, access the mount, reboot both hosts in the lab and repeat the integrity check. These Windows and systemd host tests have not been executed in the Mac-only environment.
+6. Reload systemd, access the mount and repeat the integrity check. In the temporary AWS lab, both SMB directions negotiated encrypted SMB 3.1.1 and exchanged files successfully. Windows read a 1 TiB sparse file created on Linux. A full Windows reboot left the persistent `Z:` mapping unavailable; the mapping must be re-established after reboot before production use. The Windows host and test share have since been deleted.
 
 ### 2.3 Linux server to Windows client
 
 1. On Linux, prepare a dedicated XFS data volume, mount it at `/srv/media` and persist its mount by UUID. Identify the device and back up existing data before any physical-volume formatting. The supplied demo uses only a fresh temporary loop image.
 2. Install Samba, create the `media` account, set its Samba password, and grant access to the share directory. Deploy `storage/smb.conf`, enable the Samba service and restrict TCP 445 to the Windows client's private address.
 3. On Windows, run `storage/windows/map-linux-share.ps1 -LinuxServerIP LINUX_IP`. It prompts for credentials and maps the share to `Z:` using a persistent mapping and Windows credential storage.
-4. Inspect `Get-SmbConnection`, perform bidirectional read/write/hash checks and test the mapping after a Windows reboot. Windows runtime checks remain outstanding.
+4. Inspect `Get-SmbConnection`, perform bidirectional read/write/hash checks and test the mapping after a Windows reboot. Bidirectional exchange, encryption and large-file logical length passed. The mapping did not reconnect after reboot; troubleshoot Credential Manager/logon-session behavior and repeat this test before claiming persistent mapping support.
 
 ### 2.4 Local simulation and evidence
 
@@ -166,7 +166,7 @@ Security groups allow public HTTP to Nginx, bootstrap SSH and WireGuard from the
 ### 5.2 Deployment sequence and configuration automation
 
 1. Configure temporary AWS credentials. Fill `infra/terraform.tfvars` from its example with region, public SSH key and current administrator `/32`. Keep the private key, state and plan files outside Git.
-2. Initialize and validate Terraform, review a saved plan, then apply only with an account and a reviewed budget. The locally executed initialization downloaded the AWS provider, but no AWS plan or apply was executed.
+2. Initialize and validate Terraform, review a saved plan, then apply only with an account and a reviewed budget. A temporary deployment in `eu-west-1` created the three tagged VPCs, NAT gateways, Linux hosts, storage buckets and Windows test host. The resources were removed with Terraform after validation.
 3. Export `ansible_inventory` from Terraform to the Ansible inventory file. Populate and encrypt `vault.yml` with the database password and the WireGuard client public key.
 4. Create a client tunnel in the macOS WireGuard app. Configure only the reachable gateway first using `ansible-playbook ... --limit gateway`. Obtain its public VPN key and fill the client endpoint and the three VPC routes.
 5. Activate the VPN and confirm a handshake and private SSH access. Run the full playbook to install PostgreSQL, create its role/database, deploy the Python application in a virtual environment and enable its systemd service.
@@ -176,7 +176,7 @@ The playbook uses package, file, template, database and service modules, with ha
 
 ### 5.3 Validation boundary and operational tradeoffs
 
-Terraform format checks and validation pass with the locked AWS provider. Ansible syntax checks pass with the installed collections. These checks do not prove resource creation, IAM permissions, service configuration, reachable VPN routes or idempotence. A real plan, apply, second Ansible run and isolation tests remain required.
+Terraform format/validation and a reviewed create-only plan passed. The deployed VPN handshake and private HTTP readiness check passed; the app and database hosts had no public address. Public API write/read passed, and a second full Ansible run reported zero changes on all three Linux hosts. A backup was restored to a temporary database, its marker row verified, and the temporary database dropped. This was a brief single-AZ acceptance lab, not a production reliability or security audit. All lab resources were destroyed and tagged inventory checks returned no VPCs, running instances, NAT gateways, or buckets; the exact MediaLive channel and input returned `DELETED`, and test IAM roles were absent.
 
 The design has one instance per tier in one availability zone and supplies no multi-AZ high availability. HTTP is acceptable only for this isolated demonstration; production needs TLS, authenticated application access, database transport protection, centralized logs and a tested recovery design. Two NAT gateways, EC2, public addresses, EBS and transfer may all incur charges. Confirm current regional pricing before deployment. The S3 buckets block public access, enable versioning/encryption and clean abandoned multipart uploads; non-empty buckets are not automatically destroyed by this configuration.
 
@@ -200,7 +200,7 @@ BPP normalizes the bitrate but cannot guarantee perceptual quality. Motion, nois
 
 `streaming/encode.sh` generates ten seconds of moving Full HD test video with noise audio, encodes HEVC at a configured 12 Mbps with AAC at 192 kbps and writes MPEG-TS. The probe confirms HEVC Main, 1920×1080, 25 fps, AAC stereo and MPEG-TS. Packet-level measurement records video at 12,025,571 bps and audio at 194,565 bps over the short sample; whole-container bitrate is 12,524,162 bps. Configured and observed rates are recorded separately in `streaming-summary.json`.
 
-The test used FFmpeg inside Docker. It did not use OBS, send content to AWS, or produce an AWS archive. It validates the local media settings and inspection method only. The `.ts` file is reproducible and excluded from Git to keep the source package small.
+The local test used FFmpeg inside Docker. OBS was installed and its Apple Silicon build exposes a VideoToolbox HEVC encoder, but the configured custom FFmpeg output was not successfully verified. A real AWS MediaLive input and channel configuration were accepted by the service, but the channel remained IDLE and was deleted without being started. No OBS-to-AWS ingest or S3 archive was produced. The `.ts` file is reproducible and excluded from Git to keep the source package small.
 
 ### 6.3 MediaLive and OBS deployment steps
 
@@ -213,7 +213,7 @@ The test used FFmpeg inside Docker. It did not use OBS, send content to AWS, or 
 7. Inspect MediaLive input/output metrics and alerts, wait for archive rollover, list actual S3 objects and download a generated `.ts` file. Probe it and measure the elementary-stream rates. Save redacted OBS settings, running-channel metrics and the real archive evidence.
 8. Stop the channel after testing and remove unused billable resources while preserving submission access. Exact CLI steps, policy examples and remaining checks are in `streaming/AWS.md` and `streaming/OBS.md`.
 
-The generated request files pass SDK schema validation. They contain example identifiers, not deployed resource IDs. Schema validation does not establish region availability, IAM authorization, encoder compatibility, service-side configuration acceptance or a successful live broadcast. All of those remain cloud acceptance checks.
+The generated request files pass SDK schema validation. In the acceptance run, AWS also accepted creation of the SRT listener input and single-pipeline HEVC/archive channel configuration. This confirms service-side acceptance of those settings, not successful ingest, output encoding or archive delivery. The OBS output path still requires correction and a short live-stream retest.
 
 ## 7 Evidence index and remaining acceptance checks
 
@@ -227,9 +227,14 @@ The generated request files pass SDK schema validation. They contain example ide
 | `s3-tests.log`, `nodered-flow.log` | Multipart integrity, cleanup and actual Node-RED execution |
 | `terraform-validate.log`, `ansible-syntax.log` | Local infrastructure/configuration checks |
 | `hevc-probe.log`, `streaming-summary.json` | Local Full HD HEVC/AAC media and measured rates |
-| `medialive-schema.log` | MediaLive request shape checks without AWS calls |
+| `aws-s3-multipart.log` | Real three-part S3 copy, integrity hash match and cleanup |
+| `aws-acceptance.log`, `aws-ansible-idempotence.log`, `aws-database-restore.log` | Cloud API, repeated configuration run and restore verification |
+| `aws-linux-smb.log`, `aws-windows-smb.log`, `aws-windows-largefile.log` | Encrypted bidirectional Windows/Linux SMB and 1 TiB logical file |
+| `aws-windows-reboot.log` | Reboot check showing the Windows drive mapping did not reconnect |
+| `aws-cleanup.log` | Terraform destroy completion for the temporary stack |
+| `medialive-schema.log` | MediaLive request shape checks |
 
-Before declaring full task completion, execute both Windows/Linux directions and reboot checks; run the real AWS S3 transfer; deploy the three VPCs and verify VPN isolation; run Ansible twice; and broadcast from OBS to MediaLive with a real S3 archive. Add timestamped results and update the coverage table only after observing them. The current local package supplies implementation and partial validation, not evidence of those unexecuted outcomes.
+The remaining acceptance items are to fix Windows drive reconnection after reboot and complete one OBS-to-MediaLive test that confirms HEVC ingest and an actual S3 archive object. Current cloud resources have been deleted to control cost; repeating those checks requires a new temporary deployment and budget review. The tested S3 multipart transfer and AWS infrastructure stack are not currently running.
 
 ## 8 References and provenance
 

@@ -6,11 +6,11 @@ An English report and reproducible implementation of the assessment, prepared on
 
 | Requirement | Implementation and evidence |
 | --- | --- |
-| Storage mounts, monitoring and large files | Real encrypted SMB 3.1.1 Linux mount, read/write test, Prometheus firing/resolution drill, 1 TiB sparse XFS file. Windows scripts supplied; Windows interoperability not executed. |
+| Storage mounts, monitoring and large files | AWS Windows/Linux SMB 3.1.1 encrypted read/write passed in both directions; Windows read the logical length of a 1 TiB sparse file. Its mapped drive did not reconnect after reboot. |
 | Docker application | Working Nginx/frontend, Python backend and PostgreSQL on separate networks; crash recovery, persistence, database outage, backup restore and isolated OOM checks executed. |
-| Multipart S3 transfer | Working Python multipart copy worker triggered by Node-RED; SHA-256 round trip and abort tests against Moto. AWS S3 runtime not executed. |
-| Terraform and Ansible | Three AWS VPCs, private application/database tiers and WireGuard configuration. Terraform validation and Ansible syntax checks passed; cloud deployment and VPN tests not executed. |
-| HEVC broadcast and S3 archive | Full HD local HEVC TS encoding/inspection and SDK-validated MediaLive requests. OBS-to-AWS transmission and real S3 archive not executed. |
+| Multipart S3 transfer | Three-part AWS S3 copy and SHA-256 match passed; test buckets and objects were deleted. |
+| Terraform and Ansible | Three-VPC AWS stack deployed; VPN/private access, API read/write, database restore, and zero-change second Ansible run passed. The stack was destroyed afterward. |
+| HEVC broadcast and S3 archive | Local Full HD HEVC validation passed; AWS accepted MediaLive configuration, but the channel was not started and no archive was verified. |
 | Optional MSSQL | Omitted. PostgreSQL backup/restore is demonstrated for the required stack; it is not represented as MSSQL. |
 
 ## Run the local demonstration
@@ -65,7 +65,7 @@ With Ansible installed, `python3 scripts/extra-checks.py` checks syntax, restore
 - [Demonstration and interview notes](docs/DEMO.md)
 - [Final submission checklist](docs/SUBMISSION.md)
 
-No cloud account was available for this implementation. Offline validation is not a substitute for cloud acceptance testing. The report distinguishes these results explicitly.
+The report distinguishes cloud tests from local demonstrations. Remaining gaps are Windows mapping recovery after reboot and a real OBS-to-MediaLive ingest/archive check. Temporary AWS resources have been cleaned up; see the report evidence index.
 
 Local credential files are in an owner-only directory and are ignored by Git. Compose file secrets are read-only mounts, not an encrypted secret manager. Use an IAM role for AWS S3 and an encrypted Ansible vault for server credentials. Do not publish state, plan files, credentials, private keys or database backups.
 

@@ -1,0 +1,6 @@
+{"timestamp": "2026-09-30T07:05:31.577883+00:00", "event": "copy_started", "bytes": 14000000, "parts": 3, "part_size": 5242880, "concurrency": 3, "source_version": "dvo0DcbEi0wQzeyUd1R_0PQf4bfEVc8b"}
+{"timestamp": "2026-09-30T07:05:32.283291+00:00", "event": "part_completed", "part": 2, "bytes": 5242880}
+{"timestamp": "2026-09-30T07:05:32.937392+00:00", "event": "part_completed", "part": 1, "bytes": 5242880}
+{"timestamp": "2026-09-30T07:05:32.978444+00:00", "event": "part_completed", "part": 3, "bytes": 3514240}
+{"timestamp": "2026-09-30T07:05:33.734169+00:00", "event": "copy_completed", "bytes": 14000000, "parts": 3, "seconds": 2.156, "mib_per_second": 6.19}
+{"verification": "PASS", "environment": "real AWS S3", "bytes": 14000000, "sha256": "53acf4adc4b15e2ba3286afd83525fa83a7f3c0337f124c527c4aaa43d2623cc", "metadata_preserved": true, "parts": 3}

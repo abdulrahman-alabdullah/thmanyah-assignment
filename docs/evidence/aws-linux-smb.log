@@ -1,0 +1,5 @@
+Linux client mounted the Windows SMB share using CIFS with vers=3.1.1 and seal.
+Bidirectional file test: Linux wrote a file to the Windows share and read the Windows-origin file.
+Negotiated dialect: SMB 3.1.1 (0x311).
+Negotiated encryption: AES128-GCM.
+Mount options included nosuid,nodev,noexec.

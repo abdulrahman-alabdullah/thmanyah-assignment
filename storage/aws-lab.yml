@@ -1,0 +1,72 @@
+---
+# Optional acceptance lab on the assessment's application host.
+# Pass smb_password through an encrypted vault or private extra-vars file.
+- name: Configure Linux SMB server for cross-platform acceptance
+  hosts: apps
+  become: true
+  tasks:
+    - name: Install storage tools
+      ansible.builtin.apt:
+        name: [samba, cifs-utils, fio, xfsprogs]
+    - name: Create dedicated media user
+      ansible.builtin.user:
+        name: media
+        system: true
+        create_home: false
+        shell: /usr/sbin/nologin
+    - name: Create shared directory
+      ansible.builtin.file:
+        path: /srv/media
+        state: directory
+        owner: media
+        mode: '0770'
+    - name: Set dedicated Samba credential
+      ansible.builtin.shell: 'printf "%s\n%s\n" "$ASSESSMENT_SMB_PASSWORD" "$ASSESSMENT_SMB_PASSWORD" | smbpasswd -s -a media'
+      environment:
+        ASSESSMENT_SMB_PASSWORD: '{{ smb_password }}'
+      no_log: true
+    - name: Configure encrypted authenticated SMB
+      ansible.builtin.copy:
+        dest: /etc/samba/smb.conf
+        mode: '0644'
+        content: |
+          [global]
+          server role = standalone server
+          server min protocol = SMB3_11
+          server max protocol = SMB3_11
+          smb encrypt = required
+          map to guest = never
+          [media]
+          path = /srv/media
+          valid users = media
+          read only = no
+          force user = media
+          create mask = 0660
+          directory mask = 0770
+      notify: Restart Samba
+    - name: Start Samba on boot
+      ansible.builtin.systemd:
+        name: smbd
+        state: started
+        enabled: true
+    - name: Write Windows share credentials
+      ansible.builtin.copy:
+        dest: /root/windows-smb.credentials
+        mode: '0400'
+        content: "username=media\npassword={{ smb_password }}\n"
+      no_log: true
+    - name: Create Windows mountpoint
+      ansible.builtin.file:
+        path: /mnt/windows-media
+        state: directory
+        mode: '0750'
+    - name: Persist encrypted Windows share automount
+      ansible.builtin.lineinfile:
+        path: /etc/fstab
+        line: '//10.10.10.20/media /mnt/windows-media cifs credentials=/root/windows-smb.credentials,vers=3.1.1,seal,_netdev,nofail,x-systemd.automount,nosuid,nodev,noexec 0 0'
+      notify: Reload systemd
+  handlers:
+    - name: Restart Samba
+      ansible.builtin.systemd: {name: smbd, state: restarted}
+    - name: Reload systemd
+      ansible.builtin.systemd: {daemon_reload: true}

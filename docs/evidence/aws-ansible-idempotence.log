@@ -1,0 +1,5 @@
+Second full Ansible run on the temporary AWS Linux hosts:
+
+application: ok=11 changed=0 unreachable=0 failed=0
+database:    ok=10 changed=0 unreachable=0 failed=0
+gateway:     ok=12 changed=0 unreachable=0 failed=0

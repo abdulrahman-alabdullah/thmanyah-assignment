@@ -1,0 +1,7 @@
+Windows read the Linux-created sparse file through the encrypted SMB 3.1.1 mapping.
+
+FullName: Z:\large-1tib.bin
+Logical length: 1,099,511,627,776 bytes (1 TiB)
+Result: PASS
+
+This tests logical file size and cross-platform access. The sparse file allocated no corresponding 1 TiB of physical storage.
