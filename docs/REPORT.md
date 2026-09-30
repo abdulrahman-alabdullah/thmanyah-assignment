@@ -208,6 +208,10 @@ BPP normalizes the bitrate but cannot guarantee perceptual quality. Motion, nois
 
 The local test used FFmpeg inside Docker. OBS was installed and its Apple Silicon build exposes a VideoToolbox HEVC encoder, but the configured custom FFmpeg output was not successfully verified. A real AWS MediaLive input and channel configuration were accepted by the service, but the channel remained IDLE and was deleted without being started. No OBS-to-AWS ingest or S3 archive was produced. The `.ts` file is reproducible and excluded from Git to keep the source package small.
 
+#### Broadcast diagnosis and current limit
+
+The evidence does not identify a failure inside OBS, SRT ingest, MediaLive encoding, or S3 delivery because the complete live path was never exercised. The request schema passed, AWS accepted the input/channel configuration, and the independent local FFmpeg clip passed codec/probe checks. Those results validate configuration shape and local encoding only. The decisive missing steps were verifying OBS network output, starting the MediaLive channel, observing incoming media, and inspecting a real archived S3 object. The fault location remains unknown; the broadcast status is **not tested end to end**. No billable services are currently running for this path.
+
 ### 6.3 MediaLive and OBS deployment steps
 
 1. Prepare an encrypted/private S3 archive bucket and a MediaLive role with permissions for its archive prefix and SRT secret. Create a Secrets Manager secret containing a 10-79 character passphrase as a plaintext secret value, not a JSON object. Secrets Manager encrypts that stored value. Create an input security group allowing the sender's current public `/32`.

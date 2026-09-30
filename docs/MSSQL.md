@@ -9,14 +9,18 @@ Microsoft supports SQL Server Linux containers on x86-64 Linux hosts ([Microsoft
 On an x86-64 Linux host with Docker Compose v2:
 
 ```sh
-export MSSQL_SA_PASSWORD='Use-a-unique-strong-password-here-42!'
+read -rsp 'SQL Server SA password: ' MSSQL_SA_PASSWORD
+printf '\n'
+export MSSQL_SA_PASSWORD
 docker compose -f compose.mssql.yaml up -d
-docker compose -f compose.mssql.yaml exec -T mssql \
-  /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -b -i /assessment/init.sql
+SQLCMDPASSWORD="$MSSQL_SA_PASSWORD" docker compose -f compose.mssql.yaml exec -T -e SQLCMDPASSWORD mssql \
+  /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -C -b -i /assessment/init.sql
 bash mssql/backup.sh
 ```
 
 `init.sql` is safe to rerun: it creates the table only if absent and inserts its stable-key sample row only once. The backup script creates a UTC timestamped `.bak`, enables compression and checksum, runs `RESTORE VERIFYONLY` with checksum validation, then keeps the newest 14 local backup files. The scripts pass the password to `sqlcmd` through the [`SQLCMDPASSWORD` environment variable](https://learn.microsoft.com/en-us/sql/tools/sqlcmd/sqlcmd-use-scripting-variables?view=sql-server-ver17) rather than a command-line argument. Keep `MSSQL_SA_PASSWORD` out of shell history and logs; for a long-running host, inject it from the host's secret manager.
+
+This assessment Compose example still provides SQL Server's required startup password through the container environment. A host user with Docker daemon access can inspect container configuration, so treat this as a single-user development/assessment setup; production needs a managed secret delivery and rotation process appropriate to the hosting platform.
 
 ## Automated schedule
 
@@ -37,7 +41,9 @@ The timer runs daily at 02:00 UTC and catches up a missed run after host downtim
 The test starts an isolated SQL Server container, applies the schema and seed, creates and verifies a backup, restores it as `AssessmentMSSQL_RestoreCheck`, checks the expected row, then removes all test containers and volumes. Run it locally on supported x86-64 Linux:
 
 ```sh
-export MSSQL_SA_PASSWORD='Use-a-unique-strong-password-here-42!'
+read -rsp 'SQL Server SA password: ' MSSQL_SA_PASSWORD
+printf '\n'
+export MSSQL_SA_PASSWORD
 bash mssql/acceptance.sh
 ```
 

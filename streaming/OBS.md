@@ -1,6 +1,6 @@
 # OBS to AWS Elemental MediaLive
 
-Assessment acceptance status (30 September 2026): OBS was installed temporarily on Apple Silicon and the installed build exposed a VideoToolbox HEVC encoder. A local test clip and profile were prepared, but OBS output was not verified and no stream was sent to MediaLive. The local OBS application has since been removed. A live broadcast and S3 archive are still open acceptance checks.
+Assessment acceptance status (30 September 2026): OBS was installed temporarily on Apple Silicon and the installed build exposed a VideoToolbox HEVC encoder. A local test clip and profile were prepared, but OBS output was not verified and no stream was sent to MediaLive. The local OBS application has since been removed. No live failure was captured, so there is no evidence that isolates OBS, SRT, MediaLive, or S3 as the cause. A live broadcast and S3 archive are still open acceptance checks.
 
 1. Install OBS Studio from the [official download page](https://obsproject.com/download) on macOS. Add a screen capture, camera or a moving test clip and an audio source. macOS may require screen-recording permission.
 2. In Video, set canvas and output resolution to 1920 × 1080 and FPS to 25.
