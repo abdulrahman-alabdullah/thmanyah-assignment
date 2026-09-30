@@ -16,7 +16,7 @@ docker compose -f compose.mssql.yaml exec -T mssql \
 bash mssql/backup.sh
 ```
 
-`init.sql` is safe to rerun: it creates the table only if absent and inserts its stable-key sample row only once. The backup script creates a UTC timestamped `.bak`, enables compression and checksum, then runs `RESTORE VERIFYONLY` with checksum validation. Keep `MSSQL_SA_PASSWORD` out of shell history and logs; for a long-running host, inject it from the host's secret manager.
+`init.sql` is safe to rerun: it creates the table only if absent and inserts its stable-key sample row only once. The backup script creates a UTC timestamped `.bak`, enables compression and checksum, runs `RESTORE VERIFYONLY` with checksum validation, then keeps the newest 14 local backup files. Keep `MSSQL_SA_PASSWORD` out of shell history and logs; for a long-running host, inject it from the host's secret manager.
 
 ## Automated schedule
 
