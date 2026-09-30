@@ -1,0 +1,23 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in the shell}
+    volumes:
+      - mssql_data:/var/opt/mssql
+      - ./mssql:/assessment:ro
+    mem_limit: 2g
+    cpus: 2
+    restart: unless-stopped
+    networks:
+      - mssql_internal
+
+networks:
+  mssql_internal:
+    internal: true
+
+volumes:
+  mssql_data:

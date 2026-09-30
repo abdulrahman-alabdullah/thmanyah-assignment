@@ -1,0 +1,10 @@
+[Unit]
+Description=Back up the Thmanyah assessment SQL Server database
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/thmanyah-assignment
+EnvironmentFile=/etc/thmanyah/mssql.env
+ExecStart=/usr/bin/bash /opt/thmanyah-assignment/mssql/backup.sh

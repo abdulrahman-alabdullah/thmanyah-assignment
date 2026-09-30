@@ -15,7 +15,7 @@ The submission includes local application, monitoring, storage and streaming dem
 | S3 bucket-to-bucket multipart transfer | Python copy engine and Node-RED flow | Three-part AWS multipart copy and SHA-256 equality passed; objects and buckets deleted after test |
 | Terraform and Ansible with three VPCs and VPN | AWS resources, inventory, vault templates, WireGuard and service configuration | Temporary three-VPC apply, VPN handshake/private reachability, public API, database restore, and second Ansible run (zero changes) passed; stack destroyed afterward |
 | Full HD HEVC broadcast to Elemental with S3 archive | Local TS encoder, OBS instructions, SRT/MediaLive request generator | MediaLive input/channel and OBS HEVC profile were prepared; channel was not started, so live ingest and S3 archive remain unverified; resources deleted |
-| Optional MSSQL | Not included | PostgreSQL backup/restore covers this application's recovery; it is not an MSSQL implementation |
+| Optional MSSQL database, backup, and restore | SQL Server 2022 Developer container, idempotent schema/seed, scheduled compressed/checksummed backups and isolated restore test | Implementation is included; end-to-end SQL Server runtime evidence is pending its x86-64 GitHub Actions run |
 
 The repository holds implementation files and timestamped logs under `docs/evidence/`. It contains no cloud deployment evidence borrowed from another submission. For reproduction, start with the root README and the walkthroughs linked there.
 
@@ -111,6 +111,12 @@ All three services use `restart: unless-stopped`. If a main process exits unexpe
 The executed checks killed the backend main process, recreated the backend, stopped/restarted the database, and recreated the database container. The saved marker remained readable after recreation through the named volume. During the database outage, the liveness endpoint stayed available and API calls returned 503. `app-recovery.json` records these passes. A separate disposable 64 MiB container exceeded its memory budget and was recorded as `OOMKilled=true`, exit 137. This proves cgroup memory containment; a full host RAM-exhaustion or power-failure drill was not performed.
 
 PostgreSQL backup uses `pg_dump -Fc` through `scripts/backup.sh`. A test restored the dump into a temporary database and compared the record count, then removed that temporary database. Both databases contained three records in the captured run. This is a demonstrated PostgreSQL restore, not an implementation of the optional MSSQL task. For production, schedule backups outside the application container, encrypt and retain them off-host, and test recovery time and acceptable data loss. A persistent volume alone is not a backup.
+
+### 3.6 Optional Microsoft SQL Server task
+
+The separate optional MSSQL implementation is in `mssql/` and `compose.mssql.yaml`. It creates `AssessmentMSSQL`, a constrained `dbo.BroadcastEvents` table and a stable-key 1080p broadcast sample with 12,000 kbps video and 192 kbps audio. The setup is idempotent. SQL Server Developer runs on a private Docker network with no published port, a 2-CPU/2-GiB cap and a persistent named volume.
+
+`mssql/backup.sh` makes a UTC timestamped compressed backup with checksums and then validates it with `RESTORE VERIFYONLY`. A systemd service/timer schedules it daily at 02:00 UTC on a supported x86-64 Linux host. `mssql/acceptance.sh` exercises database creation, repeatable seed, backup, restore to a separate database and seed-row readback before removing its temporary container and volume. The GitHub Actions job uses an x86-64 Ubuntu runner for that acceptance test. SQL Server Linux containers are not supported on Apple Silicon; as of report preparation, the hosted acceptance job has not yet supplied its result. The production design still requires encrypted off-host backup retention and scheduled restore drills.
 
 ## 4 Node-RED and S3 multipart transfer
 

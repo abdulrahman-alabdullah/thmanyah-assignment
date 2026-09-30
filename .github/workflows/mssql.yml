@@ -1,0 +1,30 @@
+name: MSSQL optional assessment task
+
+on:
+  push:
+    paths:
+      - 'mssql/**'
+      - 'compose.mssql.yaml'
+      - '.github/workflows/mssql.yml'
+  pull_request:
+    paths:
+      - 'mssql/**'
+      - 'compose.mssql.yaml'
+      - '.github/workflows/mssql.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mssql-backup-restore:
+    # SQL Server Linux containers are supported on x86-64 Linux hosts.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Initialize SQL Server and verify backup/restore
+        shell: bash
+        run: |
+          export MSSQL_SA_PASSWORD="Aa1!$(openssl rand -hex 24)"
+          bash mssql/acceptance.sh

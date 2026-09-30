@@ -18,12 +18,14 @@ The cloud stack was temporary and has been destroyed. The report is explicit abo
 | --- | --- | --- | --- |
 | Windows/Linux storage, persistence, monitoring, alerts, and 1 TiB files | [Storage walkthrough](storage/README.md) | `storage/`, `docs/evidence/smb-*`, `docs/evidence/xfs-sparse.log`, and `docs/evidence/aws-*.log` | Local SMB/monitoring tests passed. AWS SMB worked both ways and Windows read a logical 1 TiB sparse file. Windows `Z:` mapping did not reconnect after reboot. |
 | Docker application, automation, secrets, recovery, and resource allocation | [Local run steps](#run-the-local-demonstration) and [traceability map](docs/TRACEABILITY.md#task-2-docker-application) | `compose.yaml`, `app/`, `nginx/`, `scripts/`; `docs/evidence/app-*`, `backend-*`, `database-*`, `oom-*`, `resource-limits.log` | Local functional, recovery, persistence, resource-limit, and PostgreSQL restore checks passed. |
-| Optional MSSQL database, backup, and restore | [Traceability map](docs/TRACEABILITY.md#optional-task-mssql) | No MSSQL implementation or evidence is included. | Optional task not implemented; PostgreSQL evidence is clearly identified as PostgreSQL. |
+| Optional MSSQL database, backup, and restore | [MSSQL guide](docs/MSSQL.md) | `mssql/`, `compose.mssql.yaml`, and `.github/workflows/mssql.yml` | Implementation and isolated restore acceptance test added; run evidence is pending the x86-64 GitHub Actions job. |
 | S3 multipart bucket-to-bucket copy and logs | [S3 implementation and status](docs/TRACEABILITY.md#task-3-s3-multipart-copy-through-node-red) | `s3/`, `tests/test_s3.py`, `docs/evidence/s3-tests.log`, `nodered-flow.log`, `aws-s3-multipart.log` | Local Moto and real three-part AWS copy checks passed; temporary AWS buckets and objects were removed. |
 | Three-VPC Terraform infrastructure, Ansible configuration, and VPN | [AWS deployment guide](infra/DEPLOY.md) | `infra/`, `infra/ansible/`; `docs/evidence/terraform-*`, `ansible-syntax.log`, `aws-acceptance.log`, `aws-ansible-idempotence.log`, `aws-database-restore.log` | Temporary AWS deployment, VPN/private access, app request, DB restore, and zero-change second Ansible run passed. The stack was destroyed. |
 | OBS/vMix HEVC broadcast to Elemental with S3 archive | [MediaLive guide](streaming/AWS.md) and [OBS settings](streaming/OBS.md) | `streaming/`, `docs/evidence/hevc-*`, `medialive-schema.log`, and report section 6 | Local HEVC/AAC generation passed and AWS accepted the channel configuration. No live ingest or S3 archive was verified. |
 
 The [traceability guide](docs/TRACEABILITY.md) has the detailed sub-requirement breakdown, exact commands, evidence filenames, and qualifications for every status.
+
+The optional MSSQL task uses SQL Server 2022 Developer in a private, resource-limited Docker service. Microsoft does not support running SQL Server Linux containers on Apple Silicon, so its end-to-end acceptance test runs on a GitHub-hosted x86-64 Linux runner; see the [MSSQL guide](docs/MSSQL.md).
 
 ## Run the local demonstration
 
