@@ -7,8 +7,8 @@ stamp="$(date -u +%Y%m%dT%H%M%SZ)"
 backup_path="/var/opt/mssql/data/AssessmentMSSQL_${stamp}.bak"
 sql="BACKUP DATABASE [AssessmentMSSQL] TO DISK = N'${backup_path}' WITH INIT, COMPRESSION, CHECKSUM; RESTORE VERIFYONLY FROM DISK = N'${backup_path}' WITH CHECKSUM;"
 
-docker compose -f compose.mssql.yaml exec -T mssql \
-  /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -b -Q "$sql"
+SQLCMDPASSWORD="$MSSQL_SA_PASSWORD" docker compose -f compose.mssql.yaml exec -T -e SQLCMDPASSWORD mssql \
+  /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -C -b -Q "$sql"
 docker compose -f compose.mssql.yaml exec -T mssql /bin/bash -lc \
   'ls -1t /var/opt/mssql/data/AssessmentMSSQL_*.bak 2>/dev/null | tail -n +15 | xargs -r rm -f --'
 printf 'Backup created and verified: %s\n' "$backup_path"
