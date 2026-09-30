@@ -9,4 +9,7 @@ sql="BACKUP DATABASE [AssessmentMSSQL] TO DISK = N'${backup_path}' WITH INIT, CO
 
 docker compose -f compose.mssql.yaml exec -T mssql \
   /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -b -Q "$sql"
+docker compose -f compose.mssql.yaml exec -T mssql /bin/bash -lc \
+  'ls -1t /var/opt/mssql/data/AssessmentMSSQL_*.bak 2>/dev/null | tail -n +15 | xargs -r rm -f --'
 printf 'Backup created and verified: %s\n' "$backup_path"
+printf 'Retained the newest 14 SQL Server backups.\n'
